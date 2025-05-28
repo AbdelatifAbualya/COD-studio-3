@@ -947,9 +947,7 @@
       return tools.length > 0 ? tools : undefined;
     }
     
-    async function sendMessage(message) {
-      if (FIREWORKS_API_KEY === "YOUR_REAL_FIREWORKS_AI_API_KEY_HERE" || !FIREWORKS_API_KEY) {
-        showNotification("ERROR: Fireworks AI API Key not set. Please update in the script.", 5000);
+ 
         console.error("Fireworks AI API Key not set.");
         const thread = threads.find(t => t.id === currentThreadId);
         if (thread && thread.messages.length > 0 && thread.messages[thread.messages.length-1].isPlaceholder){ thread.messages.pop(); renderCurrentThreadMessages(); }
@@ -983,15 +981,13 @@
           thread.messages[placeholderIndex].content = "Connecting to streaming API..."; renderCurrentThreadMessages();
           let fullResponse = ""; let currentToolCalls = []; let renderPending = false;
           
-          const response = await fetch(FIREWORKS_API_URL, { 
-              method: "POST", 
-              headers: { 
-                  "Accept": "text/event-stream", 
-                  "Content-Type": "application/json", 
-                  "Authorization": `Bearer ${FIREWORKS_API_KEY}` // CORRECTED
-              }, 
-              body: JSON.stringify(payload)
-          });
+          const response = await fetch('/api/chat', { 
+    method: "POST", 
+    headers: { 
+        "Content-Type": "application/json"
+    }, 
+    body: JSON.stringify(payload)
+});
 
           if (!response.ok) { 
               const errorText = await response.text(); 
@@ -1071,17 +1067,18 @@
           };
           renderCurrentThreadMessages();
 
-        } else { // Non-streaming
-          console.log("Sending non-streaming request. Payload:", JSON.stringify(payload, null, 2).substring(0,500) + "...");
-          const response = await fetch(FIREWORKS_API_URL, { 
-              method: "POST", 
-              headers: { 
-                  "Accept": "application/json", 
-                  "Content-Type": "application/json", 
-                  "Authorization": `Bearer ${FIREWORKS_API_KEY}` // CORRECTED
-              }, 
-              body: JSON.stringify(payload)
-          });
+         }  else { // Non-streaming
+           console.log("Sending non-streaming request. Payload:", JSON.stringify(payload, null, 2).substring(0,500) + "...");
+const response = await fetch('/api/chat', { 
+    method: "POST", 
+    headers: { 
+        "Content-Type": "application/json"
+    }, 
+    body: JSON.stringify(payload)
+});
+       body: JSON.stringify(payload)
+        });  
+          
           if (!response.ok) { 
               const errorText = await response.text(); 
               console.error("Non-Streaming API Error Status:", response.status);
