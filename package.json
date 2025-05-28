@@ -1,17 +1,22 @@
 {
-  "name": "ai-reasoning-studio",
-  "version": "1.0.0",
-  "description": "AI Reasoning Studio with Chain of Draft methodology",
-  "main": "index.html",
-  "scripts": {
-    "dev": "vercel dev",
-    "build": "echo 'Static site - no build needed'",
-    "deploy": "vercel --prod"
-  },
-  "keywords": ["ai", "reasoning", "chat", "qwen", "fireworks"],
-  "author": "Your Name",
-  "license": "MIT",
-  "devDependencies": {
-    "vercel": "^32.0.0"
-  }
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
 }
