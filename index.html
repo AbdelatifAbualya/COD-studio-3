@@ -490,8 +490,6 @@
     /***********************
      * Global Configuration
      ***********************/
-   
-    const FIREWORKS_API_URL = "https://api.fireworks.ai/inference/v1/chat/completions";
     const FIREWORKS_MODEL = "accounts/fireworks/models/qwen3-235b-a22b";
 
     let PROMPTS = {
@@ -948,13 +946,7 @@
     }
     
     async function sendMessage(message) {
-      if (FIREWORKS_API_KEY === "YOUR_REAL_FIREWORKS_AI_API_KEY_HERE" || !FIREWORKS_API_KEY) {
-        showNotification("ERROR: Fireworks AI API Key not set. Please update in the script.", 5000);
-        console.error("Fireworks AI API Key not set.");
-        const thread = threads.find(t => t.id === currentThreadId);
-        if (thread && thread.messages.length > 0 && thread.messages[thread.messages.length-1].isPlaceholder){ thread.messages.pop(); renderCurrentThreadMessages(); }
-        return;
-      }
+      // Remove the API key check since we're using the serverless function
       ENABLE_STREAMING = (localStorage.getItem('streamingEnabled') !== null) ? (localStorage.getItem('streamingEnabled') === 'true') : ENABLE_STREAMING;
       addMessageToCurrentThread(message, "user", false, attachedFiles.map(f => ({name: f.name, type: f.type, size: f.size})));
       attachedFiles = []; const attachedFilesContainer = document.getElementById('attachedFiles');
@@ -967,7 +959,7 @@
       
       const startTime = performance.now(); 
       let usageData = null; 
-
+    
       try {
         const messagesForApi = buildMessagesForChat();
         const tools = getToolsConfiguration();
@@ -983,16 +975,16 @@
           thread.messages[placeholderIndex].content = "Connecting to streaming API..."; renderCurrentThreadMessages();
           let fullResponse = ""; let currentToolCalls = []; let renderPending = false;
           
-          const response = await fetch(FIREWORKS_API_URL, { 
+          // Call our serverless function instead of Fireworks directly
+          const response = await fetch('/api/chat', { 
               method: "POST", 
               headers: { 
                   "Accept": "text/event-stream", 
-                  "Content-Type": "application/json", 
-                  "Authorization": `Bearer ${FIREWORKS_API_KEY}` // CORRECTED
+                  "Content-Type": "application/json"
               }, 
               body: JSON.stringify(payload)
           });
-
+    
           if (!response.ok) { 
               const errorText = await response.text(); 
               console.error("Streaming API Error Status:", response.status);
@@ -1015,7 +1007,7 @@
                   if (data.usage) {
                     usageData = data.usage; 
                   }
-
+    
                   if (data.choices && data.choices[0]) {
                     const delta = data.choices[0].delta;
                     if (delta && delta.content) fullResponse += delta.content;
@@ -1070,18 +1062,20 @@
             totalTokens: usageData ? usageData.total_tokens : undefined
           };
           renderCurrentThreadMessages();
-
+    
         } else { // Non-streaming
           console.log("Sending non-streaming request. Payload:", JSON.stringify(payload, null, 2).substring(0,500) + "...");
-          const response = await fetch(FIREWORKS_API_URL, { 
+          
+          // Call our serverless function instead of Fireworks directly
+          const response = await fetch('/api/chat', { 
               method: "POST", 
               headers: { 
                   "Accept": "application/json", 
-                  "Content-Type": "application/json", 
-                  "Authorization": `Bearer ${FIREWORKS_API_KEY}` // CORRECTED
+                  "Content-Type": "application/json"
               }, 
               body: JSON.stringify(payload)
           });
+          
           if (!response.ok) { 
               const errorText = await response.text(); 
               console.error("Non-Streaming API Error Status:", response.status);
@@ -1095,7 +1089,7 @@
           const endTime = performance.now();
           const durationSeconds = ((endTime - startTime) / 1000).toFixed(2);
           usageData = data.usage; 
-
+    
           const botReply = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content; 
           const toolCalls = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.tool_calls;
           
@@ -1173,6 +1167,12 @@
     function setupTabNavigation() {
       const tabButtons = document.querySelectorAll('.tab-btn'); const tabContents = document.querySelectorAll('.tab-content');
       tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          tabButtons.forEach(btn => { btn.classList.remove('bg-primary-500', 'text-white'); btn.classList.add('text-gray-400'); });
+          tabContents.forEach(content => { content.classList.remove('active'); content.style.display = 'none'; });
+          button.classList.add('bg-primary-500', 'text-white'); button.classList.remove('text-gray-400');
+          const tabId = button.getAttribute('data-tab'); const tabContent = document.getElementById(tabId);
+          if (tabContent) { tabContent.classList.add('active'); tabContent.style.display = 'block';
         button.addEventListener('click', () => {
           tabButtons.forEach(btn => { btn.classList.remove('bg-primary-500', 'text-white'); btn.classList.add('text-gray-400'); });
           tabContents.forEach(content => { content.classList.remove('active'); content.style.display = 'none'; });
