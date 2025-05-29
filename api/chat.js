@@ -1,5 +1,15 @@
 export default async function handler(req, res) {
-  // Only allow POST requests
+  // Handle CORS for all requests
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  // Only allow POST requests for the main functionality
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -8,9 +18,10 @@ export default async function handler(req, res) {
     // Get Fireworks API key from environment variables
     const apiKey = process.env.FIREWORKS_API_KEY;
     if (!apiKey) {
+      console.error('FIREWORKS_API_KEY environment variable not set');
       return res.status(500).json({ 
         error: 'Server configuration error',
-        message: 'FIREWORKS_API_KEY environment variable not set' 
+        message: 'API key not configured. Please check server environment variables.' 
       });
     }
 
@@ -19,11 +30,19 @@ export default async function handler(req, res) {
 
     // Validate required fields
     if (!model || !messages) {
+      console.error('Missing required fields in request:', { model: !!model, messages: !!messages });
       return res.status(400).json({ 
         error: 'Bad request',
         message: 'Missing required fields: model and messages' 
       });
     }
+
+    console.log('Processing request:', { 
+      model, 
+      messageCount: messages.length, 
+      stream: !!stream,
+      toolsEnabled: !!(tools && tools.length > 0)
+    });
 
     // Prepare the request to Fireworks API
     const fireworksPayload = {
@@ -75,20 +94,31 @@ export default async function handler(req, res) {
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
       res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-      // Pipe the streaming response
-      response.body.pipeTo(new WritableStream({
-        write(chunk) {
+      if (!response.body) {
+        return res.status(500).json({ error: 'No response body from API' });
+      }
+
+      // Handle streaming with proper async iteration
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = decoder.decode(value, { stream: true });
           res.write(chunk);
-        },
-        close() {
-          res.end();
-        },
-        abort(err) {
-          console.error('Stream aborted:', err);
-          res.end();
         }
-      }));
+        res.end();
+      } catch (error) {
+        console.error('Streaming error:', error);
+        res.write(`data: {"error": "Streaming interrupted"}\n\n`);
+        res.end();
+      }
 
     } else {
       // Handle non-streaming responses
