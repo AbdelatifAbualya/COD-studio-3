@@ -31,7 +31,7 @@
               200: '#c7d2fe',
               300: '#a5b4fc',
               400: '#818cf8',
-              500: '#5686f5', // Primary accent color
+              500: '#5686f5',
               600: '#4f46e5',
               700: '#4338ca',
               800: '#3730a3',
@@ -95,21 +95,21 @@
       to { opacity: 1; transform: translateY(0); }
     }
     
-    .thinking-steps { /* This is the container for all thinking steps */
+    .thinking-steps {
       animation: fadeIn 0.3s ease;
     }
-    .thinking-step, .detailed-reflection-step, .reflection-step { /* Individual step elements */
-         animation: fadeIn 0.3s ease;
+    .thinking-step, .detailed-reflection-step, .reflection-step {
+      animation: fadeIn 0.3s ease;
     }
     
-    /* Reflection Step Animation (for final brief reflection) */
+    /* Reflection Step Animation */
     @keyframes reflectionPulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
     
-    .reflection-step .step-number { /* Applies to the 🔍 icon */
+    .reflection-step .step-number {
       animation: reflectionPulse 2s infinite;
     }
     
@@ -494,11 +494,11 @@
 
     let PROMPTS = {
       standard: "",
-      cod: "" // Will be dynamically built by updateCoDPrompt
+      cod: ""
     };
 
     let REASONING_METHOD = "cod";
-    let SELF_REFLECTION_ENABLED = true; // For the *final brief* reflection in CoD
+    let SELF_REFLECTION_ENABLED = true;
     
     let TEMPERATURE = 0.6;
     let TOP_P = 1;
@@ -551,6 +551,7 @@
           threadList.appendChild(li);
         });
       }
+      
       const mobileThreadList = document.getElementById("mobileThreadList");
       if (mobileThreadList) {
         mobileThreadList.innerHTML = "";
@@ -582,7 +583,8 @@
         if (threads.length > 0) {
           currentThreadId = threads[0].id;
         } else {
-          createNewThread(); return;
+          createNewThread(); 
+          return;
         }
         updateThreadList();
         renderCurrentThreadMessages();
@@ -592,25 +594,44 @@
     
     function downloadCurrentThreadAsTxt() {
       const thread = threads.find(t => t.id === currentThreadId);
-      if (!thread) { showNotification("Error: No active thread found"); return; }
+      if (!thread) { 
+        showNotification("Error: No active thread found"); 
+        return; 
+      }
+      
       let content = `AI Reasoning Studio - ${REASONING_METHOD.toUpperCase()}`;
-      if (REASONING_METHOD === "cod") { content += ` (Detailed Reflections Mode)`; }
+      if (REASONING_METHOD === "cod") { 
+        content += ` (Detailed Reflections Mode)`; 
+      }
       content += `\nModel: ${FIREWORKS_MODEL}\n\n`;
+      
       thread.messages.forEach(msg => {
         if (msg.isPlaceholder) return;
         const prefix = msg.sender.toUpperCase();
         content += `${prefix}:\n${msg.content}\n\n`;
+        
         if (msg.sender === 'bot' && !msg.isPlaceholder && !msg.isStreaming) {
-            if (msg.wordCount !== undefined) content += `(Words: ${msg.wordCount}`;
-            if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined) content += ` [Think: ${msg.thinkingWordCount}, Ans: ${msg.answerWordCount}]`;
+          if (msg.wordCount !== undefined) {
+            content += `(Words: ${msg.wordCount}`;
+            if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined) {
+              content += ` [Think: ${msg.thinkingWordCount}, Ans: ${msg.answerWordCount}]`;
+            }
             content += ")\n";
-            if (msg.totalTokens !== undefined) content += `(Tokens: ${msg.totalTokens}`;
-            if (msg.promptTokens !== undefined && msg.completionTokens !== undefined) content += ` [Prompt: ${msg.promptTokens}, Completion: ${msg.completionTokens}]`;
+          }
+          if (msg.totalTokens !== undefined) {
+            content += `(Tokens: ${msg.totalTokens}`;
+            if (msg.promptTokens !== undefined && msg.completionTokens !== undefined) {
+              content += ` [Prompt: ${msg.promptTokens}, Completion: ${msg.completionTokens}]`;
+            }
             content += ")\n";
-            if (msg.durationSeconds !== undefined) content += `(Time: ${msg.durationSeconds}s)\n`;
-            content += "\n";
+          }
+          if (msg.durationSeconds !== undefined) {
+            content += `(Time: ${msg.durationSeconds}s)\n`;
+          }
+          content += "\n";
         }
       });
+      
       const blob = new Blob([content], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -619,7 +640,10 @@
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
-      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+      setTimeout(() => { 
+        document.body.removeChild(a); 
+        URL.revokeObjectURL(url); 
+      }, 100);
       showNotification("TXT file downloaded");
     }
     
@@ -627,51 +651,99 @@
       const notification = document.getElementById("statusNotification");
       notification.textContent = message;
       notification.classList.add("opacity-100");
-      setTimeout(() => { notification.classList.remove("opacity-100"); }, duration);
+      setTimeout(() => { 
+        notification.classList.remove("opacity-100"); 
+      }, duration);
     }
     
     let attachedFiles = [];
+    
     function handleFileInput() {
       const fileInput = document.getElementById('fileInput');
       const attachedFilesContainer = document.getElementById('attachedFiles');
       if (!fileInput || !attachedFilesContainer) return;
+      
       fileInput.addEventListener('change', (event) => {
         try {
           const files = event.target.files;
           const maxFileSize = 10 * 1024 * 1024;
+          
           if (files.length > 0) {
             attachedFilesContainer.classList.remove('hidden');
             for (let i = 0; i < files.length; i++) {
               const file = files[i];
-              if (file.size > maxFileSize) { showNotification(`File ${file.name} is too large (max 10MB)`); continue; }
-              if (attachedFiles.some(f => f.name === file.name && f.size === file.size)) { showNotification(`File ${file.name} already attached`); continue; }
+              if (file.size > maxFileSize) { 
+                showNotification(`File ${file.name} is too large (max 10MB)`); 
+                continue; 
+              }
+              if (attachedFiles.some(f => f.name === file.name && f.size === file.size)) { 
+                showNotification(`File ${file.name} already attached`); 
+                continue; 
+              }
               attachedFiles.push(file);
               createFilePreview(file, attachedFilesContainer);
             }
             fileInput.value = '';
           }
-        } catch (error) { console.error('Error handling file upload:', error); showNotification('Error uploading file.'); }
+        } catch (error) { 
+          console.error('Error handling file upload:', error); 
+          showNotification('Error uploading file.'); 
+        }
       });
     }
+    
     function createFilePreview(file, container) {
       const filePreview = document.createElement('div');
       filePreview.className = 'relative bg-dark-700 rounded-lg p-2 border border-dark-600';
+      
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          const img = document.createElement('img'); img.className = 'w-16 h-16 object-cover rounded'; img.src = e.target.result; filePreview.appendChild(img);
-          const fileName = document.createElement('div'); fileName.className = 'mt-1 text-xs text-gray-400 text-center truncate w-16'; fileName.textContent = file.name.length > 15 ? file.name.substring(0, 12) + '...' : file.name; filePreview.appendChild(fileName);
-        }; reader.readAsDataURL(file);
+          const img = document.createElement('img'); 
+          img.className = 'w-16 h-16 object-cover rounded'; 
+          img.src = e.target.result; 
+          filePreview.appendChild(img);
+          
+          const fileName = document.createElement('div'); 
+          fileName.className = 'mt-1 text-xs text-gray-400 text-center truncate w-16'; 
+          fileName.textContent = file.name.length > 15 ? file.name.substring(0, 12) + '...' : file.name; 
+          filePreview.appendChild(fileName);
+        }; 
+        reader.readAsDataURL(file);
       } else {
-        const icon = document.createElement('div'); icon.className = 'w-16 h-16 flex items-center justify-center bg-dark-600 rounded text-2xl'; icon.textContent = getFileIcon(file.type); filePreview.appendChild(icon);
-        const fileName = document.createElement('div'); fileName.className = 'mt-1 text-xs text-gray-400 text-center truncate w-16'; fileName.textContent = file.name.length > 15 ? file.name.substring(0, 12) + '...' : file.name; filePreview.appendChild(fileName);
+        const icon = document.createElement('div'); 
+        icon.className = 'w-16 h-16 flex items-center justify-center bg-dark-600 rounded text-2xl'; 
+        icon.textContent = getFileIcon(file.type); 
+        filePreview.appendChild(icon);
+        
+        const fileName = document.createElement('div'); 
+        fileName.className = 'mt-1 text-xs text-gray-400 text-center truncate w-16'; 
+        fileName.textContent = file.name.length > 15 ? file.name.substring(0, 12) + '...' : file.name; 
+        filePreview.appendChild(fileName);
       }
-      const removeButton = document.createElement('button'); removeButton.className = 'absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs'; removeButton.textContent = '×';
-      removeButton.addEventListener('click', () => { attachedFiles = attachedFiles.filter(f => f !== file); filePreview.remove(); if (attachedFiles.length === 0) container.classList.add('hidden'); });
-      filePreview.appendChild(removeButton); container.appendChild(filePreview);
+      
+      const removeButton = document.createElement('button'); 
+      removeButton.className = 'absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs'; 
+      removeButton.textContent = '×';
+      removeButton.addEventListener('click', () => { 
+        attachedFiles = attachedFiles.filter(f => f !== file); 
+        filePreview.remove(); 
+        if (attachedFiles.length === 0) container.classList.add('hidden'); 
+      });
+      
+      filePreview.appendChild(removeButton); 
+      container.appendChild(filePreview);
     }
+    
     function getFileIcon(fileType) {
-      if (fileType.startsWith('image/')) return '🖼️'; if (fileType.startsWith('text/')) return '📄'; if (fileType.includes('pdf')) return '📑'; if (fileType.includes('word') || fileType.includes('document')) return '📝'; if (fileType.includes('excel') || fileType.includes('spreadsheet')) return '📊'; if (fileType.includes('audio')) return '🎵'; if (fileType.includes('video')) return '🎬'; return '📦';
+      if (fileType.startsWith('image/')) return '🖼️'; 
+      if (fileType.startsWith('text/')) return '📄'; 
+      if (fileType.includes('pdf')) return '📑'; 
+      if (fileType.includes('word') || fileType.includes('document')) return '📝'; 
+      if (fileType.includes('excel') || fileType.includes('spreadsheet')) return '📊'; 
+      if (fileType.includes('audio')) return '🎵'; 
+      if (fileType.includes('video')) return '🎬'; 
+      return '📦';
     }
     
     function countWords(text) {
@@ -688,103 +760,132 @@
           let thinking = content.substring(0, separatorIndex).trim();
           let answer = content.substring(separatorIndex + 4).trim();
           return {
-            content, thinking, answer,
+            content, 
+            thinking, 
+            answer,
             thinkingWordCount: countWords(thinking), 
             answerWordCount: countWords(answer)
           };
         }
       }
-      return { content, thinking: null, answer: content, thinkingWordCount: 0, answerWordCount: countWords(content) };
+      return { 
+        content, 
+        thinking: null, 
+        answer: content, 
+        thinkingWordCount: 0, 
+        answerWordCount: countWords(content) 
+      };
     }
 
     function formatThinkingSteps(thinking, reasoningMethod) {
-        if (!thinking) return '';
-        let cleanedThinking = thinking.replace(/^#{1,3}\s*/gm, ''); 
-        
-        if (reasoningMethod === "cod") {
-            let html = '';
-            let currentPosition = 0;
-            let codStepCounter = 1;
-            const length = cleanedThinking.length;
+      if (!thinking) return '';
+      let cleanedThinking = thinking.replace(/^#{1,3}\s*/gm, ''); 
+      
+      if (reasoningMethod === "cod") {
+        let html = '';
+        let currentPosition = 0;
+        let codStepCounter = 1;
+        const length = cleanedThinking.length;
 
-            const findNextMarkerInfo = (text, pos) => {
-                const drRegex = /DETAILED REFLECTION\s*(\d+)\s*:/gi;
-                const frRegex = SELF_REFLECTION_ENABLED ? /Reflection:/gi : null; 
+        const findNextMarkerInfo = (text, pos) => {
+          const drRegex = /DETAILED REFLECTION\s*(\d+)\s*:/gi;
+          const frRegex = SELF_REFLECTION_ENABLED ? /Reflection:/gi : null; 
 
-                drRegex.lastIndex = 0; 
-                let drMatch = drRegex.exec(text.substring(pos));
-                
-                let frMatch = null;
-                if (frRegex) {
-                    frRegex.lastIndex = 0; 
-                    frMatch = frRegex.exec(text.substring(pos));
-                }
-                
-                let drPos = drMatch ? drMatch.index + pos : Infinity;
-                let frPos = frMatch ? frMatch.index + pos : Infinity;
+          drRegex.lastIndex = 0; 
+          let drMatch = drRegex.exec(text.substring(pos));
+          
+          let frMatch = null;
+          if (frRegex) {
+            frRegex.lastIndex = 0; 
+            frMatch = frRegex.exec(text.substring(pos));
+          }
+          
+          let drPos = drMatch ? drMatch.index + pos : Infinity;
+          let frPos = frMatch ? frMatch.index + pos : Infinity;
 
-                if (drPos === Infinity && frPos === Infinity) return null;
+          if (drPos === Infinity && frPos === Infinity) return null;
 
-                if (drPos < frPos) {
-                    return { type: 'detailed_reflection', index: drPos, markerText: drMatch[0], number: drMatch[1], endOfMarker: drPos + drMatch[0].length };
-                } else if (frPos < drPos) { 
-                    return { type: 'final_reflection', index: frPos, markerText: frMatch[0], endOfMarker: frPos + frMatch[0].length };
-                }
-                return null; 
+          if (drPos < frPos) {
+            return { 
+              type: 'detailed_reflection', 
+              index: drPos, 
+              markerText: drMatch[0], 
+              number: drMatch[1], 
+              endOfMarker: drPos + drMatch[0].length 
             };
+          } else if (frPos < drPos) { 
+            return { 
+              type: 'final_reflection', 
+              index: frPos, 
+              markerText: frMatch[0], 
+              endOfMarker: frPos + frMatch[0].length 
+            };
+          }
+          return null; 
+        };
 
-            while (currentPosition < length) {
-                let nextMarker = findNextMarkerInfo(cleanedThinking, currentPosition);
-                let segmentEnd = nextMarker ? nextMarker.index : length;
+        while (currentPosition < length) {
+          let nextMarker = findNextMarkerInfo(cleanedThinking, currentPosition);
+          let segmentEnd = nextMarker ? nextMarker.index : length;
 
-                const codSegment = cleanedThinking.substring(currentPosition, segmentEnd).trim();
-                if (codSegment) {
-                    let steps = codSegment.split('.').filter(step => step.trim().length > 0);
-                    steps.forEach(step => {
-                        let stepContent = step.trim();
-                        html += `<div class="flex items-start p-3 mb-2 rounded-lg bg-slate-800/30 thinking-step">
-                                   <span class="flex items-center justify-center min-w-8 h-8 mr-3 rounded-full bg-slate-700 text-primary-400 text-sm font-bold step-number">${codStepCounter++}</span>
-                                   <span class="step-content font-mono text-sm">${stepContent}.</span>
-                                 </div>`;
-                    });
-                }
+          const codSegment = cleanedThinking.substring(currentPosition, segmentEnd).trim();
+          if (codSegment) {
+            let steps = codSegment.split('.').filter(step => step.trim().length > 0);
+            steps.forEach(step => {
+              let stepContent = step.trim();
+              html += `<div class="flex items-start p-3 mb-2 rounded-lg bg-slate-800/30 thinking-step">
+                         <span class="flex items-center justify-center min-w-8 h-8 mr-3 rounded-full bg-slate-700 text-primary-400 text-sm font-bold step-number">${codStepCounter++}</span>
+                         <span class="step-content font-mono text-sm">${stepContent}.</span>
+                       </div>`;
+            });
+          }
 
-                if (!nextMarker) break; 
+          if (!nextMarker) break; 
 
-                let reflectionContentEndPos = length;
-                let lookaheadForNext = findNextMarkerInfo(cleanedThinking, nextMarker.endOfMarker);
-                if (lookaheadForNext) {
-                    reflectionContentEndPos = lookaheadForNext.index;
-                }
-                
-                const reflectionContent = cleanedThinking.substring(nextMarker.endOfMarker, reflectionContentEndPos).trim();
+          let reflectionContentEndPos = length;
+          let lookaheadForNext = findNextMarkerInfo(cleanedThinking, nextMarker.endOfMarker);
+          if (lookaheadForNext) {
+            reflectionContentEndPos = lookaheadForNext.index;
+          }
+          
+          const reflectionContent = cleanedThinking.substring(nextMarker.endOfMarker, reflectionContentEndPos).trim();
 
-                if (nextMarker.type === 'detailed_reflection') {
-                    html += `<div class="p-4 mb-3 rounded-lg bg-sky-900/30 border-l-4 border-sky-500 detailed-reflection-step">
-                               <div class="font-semibold text-sky-300 mb-2">${nextMarker.markerText}</div>
-                               <div class="font-mono text-sm text-sky-200">${transformMessage(reflectionContent)}</div>
-                             </div>`;
-                } else if (nextMarker.type === 'final_reflection') {
-                     html += `<div class="flex items-start p-3 mb-2 rounded-lg bg-indigo-900/20 border-l-4 border-indigo-500 reflection-step">
-                                <span class="flex items-center justify-center min-w-8 h-8 mr-3 rounded-full bg-indigo-700/50 text-indigo-300 text-sm font-bold step-number">🔍</span>
-                                <span class="step-content font-mono text-sm text-indigo-300">${nextMarker.markerText} ${transformMessage(reflectionContent)}</span>
-                              </div>`;
-                }
-                currentPosition = reflectionContentEndPos;
-            }
-            return html;
+          if (nextMarker.type === 'detailed_reflection') {
+            html += `<div class="p-4 mb-3 rounded-lg bg-sky-900/30 border-l-4 border-sky-500 detailed-reflection-step">
+                       <div class="font-semibold text-sky-300 mb-2">${nextMarker.markerText}</div>
+                       <div class="font-mono text-sm text-sky-200">${transformMessage(reflectionContent)}</div>
+                     </div>`;
+          } else if (nextMarker.type === 'final_reflection') {
+            html += `<div class="flex items-start p-3 mb-2 rounded-lg bg-indigo-900/20 border-l-4 border-indigo-500 reflection-step">
+                      <span class="flex items-center justify-center min-w-8 h-8 mr-3 rounded-full bg-indigo-700/50 text-indigo-300 text-sm font-bold step-number">🔍</span>
+                      <span class="step-content font-mono text-sm text-indigo-300">${nextMarker.markerText} ${transformMessage(reflectionContent)}</span>
+                    </div>`;
+          }
+          currentPosition = reflectionContentEndPos;
         }
-        return `<div class="p-2 mb-2 border-l-2 border-slate-600">${transformMessage(cleanedThinking)}</div>`;
+        return html;
+      }
+      return `<div class="p-2 mb-2 border-l-2 border-slate-600">${transformMessage(cleanedThinking)}</div>`;
     }
     
     function transformMessage(content) {
       if (!content) return '';
+      
       if (typeof marked !== 'undefined') {
-        return marked.parse(content);
+        try {
+          return marked.parse(content);
+        } catch (e) {
+          console.warn('Marked.js error:', e);
+          return content.replace(/\n/g, '<br>');
+        }
       } else {
         return content.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
-          let language = ''; const lines = codeContent.split('\n');
-          if (lines.length > 0 && !lines[0].includes(' ')) { language = lines[0].trim(); lines.shift(); }
+          let language = ''; 
+          const lines = codeContent.split('\n');
+          if (lines.length > 0 && !lines[0].includes(' ')) { 
+            language = lines[0].trim(); 
+            lines.shift(); 
+          }
           return `<pre><code class="${language}">${lines.join('\n')}</code></pre>`;
         }).replace(/\n/g, '<br>');
       }
@@ -793,11 +894,14 @@
     function renderCurrentThreadMessages() {
       const chatMessagesDiv = document.getElementById("chatMessages");
       if (!chatMessagesDiv) return;
+      
       chatMessagesDiv.innerHTML = "";
       const thread = threads.find(t => t.id === currentThreadId);
+      
       if (thread) {
         thread.messages.forEach(msg => {
           const messageDiv = document.createElement("div");
+          
           if (msg.sender === "user") {
             messageDiv.className = "flex justify-end";
             const msgContent = document.createElement("div");
@@ -809,6 +913,7 @@
             messageDiv.className = "flex justify-start";
             const msgContent = document.createElement("div");
             msgContent.className = "max-w-[90%] bg-dark-700 border border-dark-500 p-4 rounded-2xl rounded-tl-sm shadow-md";
+            
             if (msg.isPlaceholder) {
               msgContent.classList.add("opacity-70");
               msgContent.innerHTML = `<div class="flex items-center gap-2"><svg class="animate-spin h-4 w-4 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>${msg.content}</div>`;
@@ -819,21 +924,26 @@
             } else if (msg.thinking) { 
               const thinkingContainer = document.createElement("div");
               thinkingContainer.className = "thinking-steps bg-dark-800 rounded-lg p-4 mb-4 border border-dark-600";
+              
               const thinkingLabel = document.createElement("div");
               thinkingLabel.className = "text-xs uppercase tracking-wider font-semibold text-gray-400 mb-3 pb-2 border-b border-dark-500";
               thinkingLabel.textContent = "Chain of Draft & Reflections";
               thinkingContainer.appendChild(thinkingLabel);
+              
               const thinkingContentDiv = document.createElement("div");
               thinkingContentDiv.innerHTML = formatThinkingSteps(msg.thinking, msg.reasoningMethod ? msg.reasoningMethod.toLowerCase().split('-')[0] : REASONING_METHOD);
               thinkingContainer.appendChild(thinkingContentDiv);
               msgContent.appendChild(thinkingContainer);
+              
               if (msg.answer) {
                 const answerDiv = document.createElement("div");
                 answerDiv.className = "bg-dark-800 rounded-lg p-4 border border-dark-600";
+                
                 const answerLabel = document.createElement("div");
                 answerLabel.className = "text-xs uppercase tracking-wider font-semibold text-primary-400 mb-3 pb-2 border-b border-dark-500";
                 answerLabel.textContent = "Final Detailed Answer";
                 answerDiv.appendChild(answerLabel);
+                
                 const answerContent = document.createElement("div");
                 answerContent.innerHTML = transformMessage(msg.answer); 
                 answerDiv.appendChild(answerContent);
@@ -844,50 +954,50 @@
             }
             
             if (msg.tool_calls && msg.tool_calls.length > 0) {
-                const toolBadge = document.createElement("div");
-                toolBadge.className = "mt-2 px-2 py-1 bg-blue-900/20 border border-blue-800/30 rounded text-xs text-blue-400";
-                let toolCallSummary = msg.tool_calls.map(tc => tc.type === "function" && tc.function ? `${tc.function.name}(${tc.function.arguments ? Object.values(JSON.parse(tc.function.arguments)).join(', ') : ''})` : tc.type).join(", ");
-                toolBadge.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg> Requested: ${toolCallSummary}`;
-                msgContent.appendChild(toolBadge);
+              const toolBadge = document.createElement("div");
+              toolBadge.className = "mt-2 px-2 py-1 bg-blue-900/20 border border-blue-800/30 rounded text-xs text-blue-400";
+              let toolCallSummary = msg.tool_calls.map(tc => tc.type === "function" && tc.function ? `${tc.function.name}(${tc.function.arguments ? Object.values(JSON.parse(tc.function.arguments)).join(', ') : ''})` : tc.type).join(", ");
+              toolBadge.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg> Requested: ${toolCallSummary}`;
+              msgContent.appendChild(toolBadge);
             }
 
             if (!msg.isPlaceholder && !msg.isStreaming) {
-                const statsDiv = document.createElement("div");
-                statsDiv.className = "mt-3 pt-2 border-t border-dark-600/50 text-xs text-gray-400 flex flex-wrap gap-x-4 gap-y-1 items-center";
-                
-                let statsAdded = false;
-                if (msg.wordCount !== undefined) {
-                    let badgeText = `Words: <span class="text-gray-300">${msg.wordCount}</span>`;
-                    if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined && (msg.thinkingWordCount > 0 || msg.answerWordCount > 0)) {
-                        badgeText = `Words: <span class="text-gray-300">${msg.thinkingWordCount}</span> (think) + <span class="text-primary-300">${msg.answerWordCount}</span> (ans)`;
-                    }
-                    const wordStat = document.createElement('span');
-                    wordStat.innerHTML = badgeText;
-                    statsDiv.appendChild(wordStat);
-                    statsAdded = true;
+              const statsDiv = document.createElement("div");
+              statsDiv.className = "mt-3 pt-2 border-t border-dark-600/50 text-xs text-gray-400 flex flex-wrap gap-x-4 gap-y-1 items-center";
+              
+              let statsAdded = false;
+              if (msg.wordCount !== undefined) {
+                let badgeText = `Words: <span class="text-gray-300">${msg.wordCount}</span>`;
+                if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined && (msg.thinkingWordCount > 0 || msg.answerWordCount > 0)) {
+                  badgeText = `Words: <span class="text-gray-300">${msg.thinkingWordCount}</span> (think) + <span class="text-primary-300">${msg.answerWordCount}</span> (ans)`;
                 }
+                const wordStat = document.createElement('span');
+                wordStat.innerHTML = badgeText;
+                statsDiv.appendChild(wordStat);
+                statsAdded = true;
+              }
 
-                if (msg.totalTokens !== undefined) {
-                    let tokenText = `Tokens: <span class="text-teal-400 font-medium">${msg.totalTokens}</span> total`;
-                    if (msg.promptTokens !== undefined && msg.completionTokens !== undefined) {
-                        tokenText = `Tokens: <span class="text-gray-300">${msg.promptTokens}</span> (p) + <span class="text-teal-300 font-medium">${msg.completionTokens}</span> (c)`;
-                    }
-                    const tokenStat = document.createElement('span');
-                    tokenStat.innerHTML = tokenText;
-                    statsDiv.appendChild(tokenStat);
-                    statsAdded = true;
+              if (msg.totalTokens !== undefined) {
+                let tokenText = `Tokens: <span class="text-teal-400 font-medium">${msg.totalTokens}</span> total`;
+                if (msg.promptTokens !== undefined && msg.completionTokens !== undefined) {
+                  tokenText = `Tokens: <span class="text-gray-300">${msg.promptTokens}</span> (p) + <span class="text-teal-300 font-medium">${msg.completionTokens}</span> (c)`;
                 }
+                const tokenStat = document.createElement('span');
+                tokenStat.innerHTML = tokenText;
+                statsDiv.appendChild(tokenStat);
+                statsAdded = true;
+              }
 
-                if (msg.durationSeconds !== undefined) {
-                    const timeStat = document.createElement('span');
-                    timeStat.innerHTML = `Time: <span class="text-amber-400 font-medium">${msg.durationSeconds}s</span>`;
-                    statsDiv.appendChild(timeStat);
-                    statsAdded = true;
-                }
+              if (msg.durationSeconds !== undefined) {
+                const timeStat = document.createElement('span');
+                timeStat.innerHTML = `Time: <span class="text-amber-400 font-medium">${msg.durationSeconds}s</span>`;
+                statsDiv.appendChild(timeStat);
+                statsAdded = true;
+              }
 
-                if (statsAdded) {
-                    msgContent.appendChild(statsDiv);
-                }
+              if (statsAdded) {
+                msgContent.appendChild(statsDiv);
+              }
             }
             messageDiv.appendChild(msgContent);
           }
@@ -895,28 +1005,45 @@
         });
         chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
       }
-      if (typeof hljs !== 'undefined') { document.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block)); }
+      
+      if (typeof hljs !== 'undefined') { 
+        document.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block)); 
+      }
       addCodeCopyButtons();
     }
+    
     function addFilesToMessage(msgContent, files) {
-        const filesDiv = document.createElement('div'); filesDiv.className = 'mt-2 text-xs text-gray-300 italic';
-        filesDiv.textContent = `(${files.length} file(s) attached, not sent to this model)`; msgContent.appendChild(filesDiv);
+      const filesDiv = document.createElement('div'); 
+      filesDiv.className = 'mt-2 text-xs text-gray-300 italic';
+      filesDiv.textContent = `(${files.length} file(s) attached, not sent to this model)`; 
+      msgContent.appendChild(filesDiv);
     }
+    
     function addMessageToCurrentThread(content, sender, isPlaceholder = false, files = []) {
       const thread = threads.find(t => t.id === currentThreadId);
       if (thread) {
         let thinking = null, answer = null, thinkingWordCount = 0, answerWordCount = 0, totalWordCount = 0;
+        
         if (sender === "bot" && !isPlaceholder) {
           const processed = processBotMessage(content, REASONING_METHOD);
-          thinking = processed.thinking; answer = processed.answer;
-          thinkingWordCount = processed.thinkingWordCount || 0; answerWordCount = processed.answerWordCount || 0;
+          thinking = processed.thinking; 
+          answer = processed.answer;
+          thinkingWordCount = processed.thinkingWordCount || 0; 
+          answerWordCount = processed.answerWordCount || 0;
           totalWordCount = thinkingWordCount + answerWordCount;
         }
+        
         thread.messages.push({
-          content, sender, isPlaceholder, timestamp: new Date(),
+          content, 
+          sender, 
+          isPlaceholder, 
+          timestamp: new Date(),
           wordCount: sender === "bot" && !isPlaceholder ? totalWordCount : (countWords(content) || 0),
           reasoningMethod: sender === "bot" && !isPlaceholder ? REASONING_METHOD.toUpperCase() : undefined,
-          thinking, answer, thinkingWordCount, answerWordCount,
+          thinking, 
+          answer, 
+          thinkingWordCount, 
+          answerWordCount,
           files: files && files.length > 0 ? files.map(f => ({ name: f.name, type: f.type, size: f.size })) : undefined,
         });
         renderCurrentThreadMessages();
@@ -926,31 +1053,58 @@
     function buildMessagesForChat() {
       const thread = threads.find(t => t.id === currentThreadId);
       if (!thread) return [];
+      
       const messages = [];
       if (REASONING_METHOD !== "standard") {
         messages.push({ role: "system", content: PROMPTS[REASONING_METHOD] });
       }
+      
       thread.messages.filter(msg => !msg.isPlaceholder).forEach(msg => {
-          const apiMessage = { role: msg.sender === "user" ? "user" : "assistant", content: msg.content };
-          if (msg.tool_calls) apiMessage.tool_calls = msg.tool_calls;
-          messages.push(apiMessage);
-        });
+        const apiMessage = { 
+          role: msg.sender === "user" ? "user" : "assistant", 
+          content: msg.content 
+        };
+        if (msg.tool_calls) apiMessage.tool_calls = msg.tool_calls;
+        messages.push(apiMessage);
+      });
+      
       return messages;
     }
+    
     function getToolsConfiguration() {
       const tools = [];
       if (ENABLED_MCP_TOOLS.includes("tavily_search") || enableWebSearchQuickToggle) {
-        tools.push({ type: "function", function: { name: "tavily_search", description: "Performs a web search using Tavily for up-to-date information.", parameters: { type: "object", properties: { query: { type: "string", description: "The search query for Tavily." }}, required: ["query"]}}});
+        tools.push({ 
+          type: "function", 
+          function: { 
+            name: "tavily_search", 
+            description: "Performs a web search using Tavily for up-to-date information.", 
+            parameters: { 
+              type: "object", 
+              properties: { 
+                query: { 
+                  type: "string", 
+                  description: "The search query for Tavily." 
+                }
+              }, 
+              required: ["query"]
+            }
+          }
+        });
       }
       return tools.length > 0 ? tools : undefined;
     }
     
     async function sendMessage(message) {
-      // Remove the API key check since we're using the serverless function
       ENABLE_STREAMING = (localStorage.getItem('streamingEnabled') !== null) ? (localStorage.getItem('streamingEnabled') === 'true') : ENABLE_STREAMING;
+      
       addMessageToCurrentThread(message, "user", false, attachedFiles.map(f => ({name: f.name, type: f.type, size: f.size})));
-      attachedFiles = []; const attachedFilesContainer = document.getElementById('attachedFiles');
-      if (attachedFilesContainer) { attachedFilesContainer.innerHTML = ''; attachedFilesContainer.style.display = 'none'; }
+      attachedFiles = []; 
+      const attachedFilesContainer = document.getElementById('attachedFiles');
+      if (attachedFilesContainer) { 
+        attachedFilesContainer.innerHTML = ''; 
+        attachedFilesContainer.classList.add('hidden'); 
+      }
       
       let placeholderText = "Thinking...";
       addMessageToCurrentThread(placeholderText, "bot", true);
@@ -967,41 +1121,75 @@
         if (isNaN(validatedMaxTokens) || !isFinite(validatedMaxTokens)) validatedMaxTokens = 4096;
         validatedMaxTokens = Math.min(Math.max(1, validatedMaxTokens), 8192);
         
-        const payload = { model: FIREWORKS_MODEL, messages: messagesForApi, temperature: TEMPERATURE, top_p: TOP_P, top_k: TOP_K, max_tokens: validatedMaxTokens, presence_penalty: PRESENCE_PENALTY, frequency_penalty: FREQUENCY_PENALTY, stream: ENABLE_STREAMING };
-        if (tools && tools.length > 0) { payload.tools = tools; payload.tool_choice = "auto"; }
+        const payload = { 
+          model: FIREWORKS_MODEL, 
+          messages: messagesForApi, 
+          temperature: TEMPERATURE, 
+          top_p: TOP_P, 
+          top_k: TOP_K, 
+          max_tokens: validatedMaxTokens, 
+          presence_penalty: PRESENCE_PENALTY, 
+          frequency_penalty: FREQUENCY_PENALTY, 
+          stream: ENABLE_STREAMING 
+        };
+        
+        if (tools && tools.length > 0) { 
+          payload.tools = tools; 
+          payload.tool_choice = "auto"; 
+        }
         
         if (ENABLE_STREAMING) {
           console.log("Using streaming mode. Payload:", JSON.stringify(payload, null, 2).substring(0,500) + "...");
-          thread.messages[placeholderIndex].content = "Connecting to streaming API..."; renderCurrentThreadMessages();
-          let fullResponse = ""; let currentToolCalls = []; let renderPending = false;
+          thread.messages[placeholderIndex].content = "Connecting to streaming API..."; 
+          renderCurrentThreadMessages();
           
-          // Call our serverless function instead of Fireworks directly
+          let fullResponse = ""; 
+          let currentToolCalls = []; 
+          let renderPending = false;
+          
           const response = await fetch('/api/chat', { 
-              method: "POST", 
-              headers: { 
-                  "Accept": "text/event-stream", 
-                  "Content-Type": "application/json"
-              }, 
-              body: JSON.stringify(payload)
+            method: "POST", 
+            headers: { 
+                "Accept": "text/event-stream", 
+                "Content-Type": "application/json"
+            }, 
+            body: JSON.stringify(payload)
           });
     
           if (!response.ok) { 
-              const errorText = await response.text(); 
-              console.error("Streaming API Error Status:", response.status);
-              console.error("Streaming API Error Text:", errorText); 
-              let errorData; 
-              try { errorData = JSON.parse(errorText); } catch (e) { errorData = { message: response.statusText || "Unknown streaming error" }; } 
-              throw new Error(`Error starting stream: ${response.status} - ${errorData.fault?.faultstring || errorData.message || 'Unknown error'}`); 
+            const errorText = await response.text(); 
+            console.error("Streaming API Error Status:", response.status);
+            console.error("Streaming API Error Text:", errorText); 
+            let errorData; 
+            try { 
+              errorData = JSON.parse(errorText); 
+            } catch (e) { 
+              errorData = { message: response.statusText || "Unknown streaming error" }; 
+            } 
+            throw new Error(`Error starting stream: ${response.status} - ${errorData.fault?.faultstring || errorData.message || 'Unknown error'}`); 
           }
           
-          const reader = response.body.getReader(); const decoder = new TextDecoder();
+          const reader = response.body.getReader(); 
+          const decoder = new TextDecoder();
+          
           while (true) {
-            const { done, value } = await reader.read(); if (done) { console.log("Stream complete"); break; }
+            const { done, value } = await reader.read(); 
+            if (done) { 
+              console.log("Stream complete"); 
+              break; 
+            }
+            
             const chunk = decoder.decode(value, { stream: true }); 
-            const lines = chunk.split('\n\n');
+            const lines = chunk.split('\n');
+            
             for (const line of lines) {
               if (line.startsWith('data: ')) {
-                const dataText = line.substring(6).trim(); if (dataText === '[DONE]') { console.log("Received [DONE] marker"); continue; }
+                const dataText = line.substring(6).trim(); 
+                if (dataText === '[DONE]') { 
+                  console.log("Received [DONE] marker"); 
+                  continue; 
+                }
+                
                 try {
                   const data = JSON.parse(dataText);
                   if (data.usage) {
@@ -1011,38 +1199,63 @@
                   if (data.choices && data.choices[0]) {
                     const delta = data.choices[0].delta;
                     if (delta && delta.content) fullResponse += delta.content;
+                    
                     if (delta && delta.tool_calls) { 
-                        delta.tool_calls.forEach(tc => { 
-                            if (tc.index >= currentToolCalls.length) currentToolCalls.push({ id: tc.id, type: tc.type, function: { name: tc.function.name, arguments: "" }}); 
-                            if (tc.function && tc.function.arguments) currentToolCalls[tc.index].function.arguments += tc.function.arguments; 
-                        }); 
+                      delta.tool_calls.forEach(tc => { 
+                        if (tc.index >= currentToolCalls.length) {
+                          currentToolCalls.push({ 
+                            id: tc.id, 
+                            type: tc.type, 
+                            function: { 
+                              name: tc.function.name, 
+                              arguments: "" 
+                            }
+                          }); 
+                        }
+                        if (tc.function && tc.function.arguments) {
+                          currentToolCalls[tc.index].function.arguments += tc.function.arguments; 
+                        }
+                      }); 
                     }
                     
                     thread.messages[placeholderIndex] = { 
-                        ...thread.messages[placeholderIndex],
-                        content: fullResponse, 
-                        sender: "bot", 
-                        isPlaceholder: false, 
-                        timestamp: new Date(), 
-                        isStreaming: true, 
-                        tool_calls: currentToolCalls.length > 0 ? JSON.parse(JSON.stringify(currentToolCalls)) : undefined 
+                      ...thread.messages[placeholderIndex],
+                      content: fullResponse, 
+                      sender: "bot", 
+                      isPlaceholder: false, 
+                      timestamp: new Date(), 
+                      isStreaming: true, 
+                      tool_calls: currentToolCalls.length > 0 ? JSON.parse(JSON.stringify(currentToolCalls)) : undefined 
                     };
-                    if (!renderPending) { renderPending = true; requestAnimationFrame(() => { renderCurrentThreadMessages(); renderPending = false; }); }
+                    
+                    if (!renderPending) { 
+                      renderPending = true; 
+                      requestAnimationFrame(() => { 
+                        renderCurrentThreadMessages(); 
+                        renderPending = false; 
+                      }); 
+                    }
                     
                     if (data.choices[0].finish_reason) {
-                        console.log("Stream finished with reason:", data.choices[0].finish_reason);
-                        if(data.usage) {
-                           usageData = data.usage;
-                        }
+                      console.log("Stream finished with reason:", data.choices[0].finish_reason);
+                      if(data.usage) {
+                         usageData = data.usage;
+                      }
                     }
                   }
-                } catch (parseError) { if (dataText) console.log("Non-JSON data or parse error in stream:", dataText, parseError); }
+                } catch (parseError) { 
+                  if (dataText) {
+                    console.log("Non-JSON data or parse error in stream:", dataText, parseError); 
+                  }
+                }
               }
             }
           }
+          
           const endTime = performance.now();
           const durationSeconds = ((endTime - startTime) / 1000).toFixed(2);
           const processed = processBotMessage(fullResponse, REASONING_METHOD);
+          
           thread.messages[placeholderIndex] = { 
             content: fullResponse, 
             sender: "bot", 
@@ -1066,23 +1279,26 @@
         } else { // Non-streaming
           console.log("Sending non-streaming request. Payload:", JSON.stringify(payload, null, 2).substring(0,500) + "...");
           
-          // Call our serverless function instead of Fireworks directly
           const response = await fetch('/api/chat', { 
-              method: "POST", 
-              headers: { 
-                  "Accept": "application/json", 
-                  "Content-Type": "application/json"
-              }, 
-              body: JSON.stringify(payload)
+            method: "POST", 
+            headers: { 
+                "Accept": "application/json", 
+                "Content-Type": "application/json"
+            }, 
+            body: JSON.stringify(payload)
           });
           
           if (!response.ok) { 
-              const errorText = await response.text(); 
-              console.error("Non-Streaming API Error Status:", response.status);
-              console.error("Non-Streaming API Error Text:", errorText); 
-              let errorData; 
-              try { errorData = JSON.parse(errorText); } catch (e) { errorData = { message: response.statusText || "Unknown non-streaming error" };} 
-              throw new Error(`API returned status: ${response.status} - ${errorData.fault?.faultstring || errorData.message || 'Unknown error'}`);
+            const errorText = await response.text(); 
+            console.error("Non-Streaming API Error Status:", response.status);
+            console.error("Non-Streaming API Error Text:", errorText); 
+            let errorData; 
+            try { 
+              errorData = JSON.parse(errorText); 
+            } catch (e) { 
+              errorData = { message: response.statusText || "Unknown non-streaming error" };
+            } 
+            throw new Error(`API returned status: ${response.status} - ${errorData.fault?.faultstring || errorData.message || 'Unknown error'}`);
           }
           
           const data = await response.json();
@@ -1096,6 +1312,7 @@
           if (botReply || toolCalls) {
             const finalContent = botReply || ""; 
             const processed = processBotMessage(finalContent, REASONING_METHOD);
+            
             thread.messages[placeholderIndex] = { 
                 content: finalContent, 
                 sender: "bot", 
@@ -1114,7 +1331,10 @@
                 totalTokens: usageData ? usageData.total_tokens : undefined
             };
             renderCurrentThreadMessages();
-          } else { console.error("API Response Data:", data); throw new Error("No content or tool_calls in API response."); }
+          } else { 
+            console.error("API Response Data:", data); 
+            throw new Error("No content or tool_calls in API response."); 
+          }
         }
       } catch (error) {
         console.error("Error sending message:", error);
@@ -1144,54 +1364,140 @@
     function addCodeCopyButtons() {
       document.querySelectorAll('pre code').forEach(code => {
         if (code.parentElement.classList.contains('relative')) return;
-        const pre = code.parentElement; const container = document.createElement('div');
-        container.className = 'relative mb-4 rounded-lg overflow-hidden'; pre.parentNode.insertBefore(container, pre); container.appendChild(pre);
+        
+        const pre = code.parentElement; 
+        const container = document.createElement('div');
+        container.className = 'relative mb-4 rounded-lg overflow-hidden'; 
+        pre.parentNode.insertBefore(container, pre); 
+        container.appendChild(pre);
+        
         const language = code.className.match(/language-([^\s]+)/)?.[1];
-        if (language && language !== 'plaintext') { const langBadge = document.createElement('div'); langBadge.className = 'absolute top-2 left-2 bg-dark-900/80 text-xs py-1 px-2 rounded text-gray-400'; langBadge.textContent = language; container.appendChild(langBadge); }
+        if (language && language !== 'plaintext') { 
+          const langBadge = document.createElement('div'); 
+          langBadge.className = 'absolute top-2 left-2 bg-dark-900/80 text-xs py-1 px-2 rounded text-gray-400'; 
+          langBadge.textContent = language; 
+          container.appendChild(langBadge); 
+        }
+        
         pre.className = 'bg-dark-900 rounded-lg p-4 overflow-x-auto text-sm';
-        const copyBtn = document.createElement('button'); copyBtn.className = 'absolute top-2 right-2 bg-dark-900/80 text-gray-400 hover:text-white text-xs py-1 px-2 rounded transition-colors'; copyBtn.textContent = 'Copy';
-        copyBtn.addEventListener('click', () => { navigator.clipboard.writeText(code.textContent || '').then(() => { copyBtn.textContent = 'Copied!'; copyBtn.classList.add('text-green-400'); setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('text-green-400'); }, 2000); }).catch(() => { copyBtn.textContent = 'Failed'; copyBtn.classList.add('text-red-400'); setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('text-red-400'); }, 2000); }); });
+        
+        const copyBtn = document.createElement('button'); 
+        copyBtn.className = 'absolute top-2 right-2 bg-dark-900/80 text-gray-400 hover:text-white text-xs py-1 px-2 rounded transition-colors'; 
+        copyBtn.textContent = 'Copy';
+        
+        copyBtn.addEventListener('click', () => { 
+          navigator.clipboard.writeText(code.textContent || '').then(() => { 
+            copyBtn.textContent = 'Copied!'; 
+            copyBtn.classList.add('text-green-400'); 
+            setTimeout(() => { 
+              copyBtn.textContent = 'Copy'; 
+              copyBtn.classList.remove('text-green-400'); 
+            }, 2000); 
+          }).catch(() => { 
+            copyBtn.textContent = 'Failed'; 
+            copyBtn.classList.add('text-red-400'); 
+            setTimeout(() => { 
+              copyBtn.textContent = 'Copy'; 
+              copyBtn.classList.remove('text-red-400'); 
+            }, 2000); 
+          }); 
+        });
+        
         container.appendChild(copyBtn);
       });
     }
+    
     function toggleWebSearchQuickButton() {
-      const btn = document.getElementById('webSearchBtn'); if (!btn) return;
+      const btn = document.getElementById('webSearchBtn'); 
+      if (!btn) return;
+      
       enableWebSearchQuickToggle = !enableWebSearchQuickToggle;
-      if (enableWebSearchQuickToggle) { btn.classList.add('bg-primary-500', 'text-white'); btn.classList.remove('bg-dark-500', 'text-gray-300'); btn.title = "Tavily Web Search enabled"; } else { btn.classList.remove('bg-primary-500', 'text-white'); btn.classList.add('bg-dark-500', 'text-gray-300'); btn.title = "Tavily Web Search disabled"; }
+      
+      if (enableWebSearchQuickToggle) { 
+        btn.classList.add('bg-primary-500', 'text-white'); 
+        btn.classList.remove('bg-dark-500', 'text-gray-300'); 
+        btn.title = "Tavily Web Search enabled"; 
+      } else { 
+        btn.classList.remove('bg-primary-500', 'text-white'); 
+        btn.classList.add('bg-dark-500', 'text-gray-300'); 
+        btn.title = "Tavily Web Search disabled"; 
+      }
+      
       const tavilyToolCheckbox = document.getElementById('tavilySearchTool');
-      if (tavilyToolCheckbox) { tavilyToolCheckbox.checked = enableWebSearchQuickToggle; if (enableWebSearchQuickToggle) { if (!ENABLED_MCP_TOOLS.includes("tavily_search")) ENABLED_MCP_TOOLS.push("tavily_search"); } else { ENABLED_MCP_TOOLS = ENABLED_MCP_TOOLS.filter(t => t !== "tavily_search"); }}
-      localStorage.setItem('enableWebSearchQuickToggle', enableWebSearchQuickToggle.toString()); localStorage.setItem('enabledMcpTools', JSON.stringify(ENABLED_MCP_TOOLS));
+      if (tavilyToolCheckbox) { 
+        tavilyToolCheckbox.checked = enableWebSearchQuickToggle; 
+        if (enableWebSearchQuickToggle) { 
+          if (!ENABLED_MCP_TOOLS.includes("tavily_search")) {
+            ENABLED_MCP_TOOLS.push("tavily_search"); 
+          }
+        } else { 
+          ENABLED_MCP_TOOLS = ENABLED_MCP_TOOLS.filter(t => t !== "tavily_search"); 
+        }
+      }
+      
+      localStorage.setItem('enableWebSearchQuickToggle', enableWebSearchQuickToggle.toString()); 
+      localStorage.setItem('enabledMcpTools', JSON.stringify(ENABLED_MCP_TOOLS));
       showNotification(enableWebSearchQuickToggle ? 'Tavily search enabled' : 'Tavily search disabled');
     }
 
     function setupTabNavigation() {
-      const tabButtons = document.querySelectorAll('.tab-btn'); const tabContents = document.querySelectorAll('.tab-content');
+      const tabButtons = document.querySelectorAll('.tab-btn'); 
+      const tabContents = document.querySelectorAll('.tab-content');
+      
       tabButtons.forEach(button => {
         button.addEventListener('click', () => {
-          tabButtons.forEach(btn => { btn.classList.remove('bg-primary-500', 'text-white'); btn.classList.add('text-gray-400'); });
-          tabContents.forEach(content => { content.classList.remove('active'); content.style.display = 'none'; });
-          button.classList.add('bg-primary-500', 'text-white'); button.classList.remove('text-gray-400');
-          const tabId = button.getAttribute('data-tab'); const tabContent = document.getElementById(tabId);
-          if (tabContent) { tabContent.classList.add('active'); tabContent.style.display = 'block';
-        button.addEventListener('click', () => {
-          tabButtons.forEach(btn => { btn.classList.remove('bg-primary-500', 'text-white'); btn.classList.add('text-gray-400'); });
-          tabContents.forEach(content => { content.classList.remove('active'); content.style.display = 'none'; });
-          button.classList.add('bg-primary-500', 'text-white'); button.classList.remove('text-gray-400');
-          const tabId = button.getAttribute('data-tab'); const tabContent = document.getElementById(tabId);
-          if (tabContent) { tabContent.classList.add('active'); tabContent.style.display = 'block'; }
+          // Remove active state from all buttons and contents
+          tabButtons.forEach(btn => { 
+            btn.classList.remove('bg-primary-500', 'text-white'); 
+            btn.classList.add('text-gray-400'); 
+          });
+          tabContents.forEach(content => { 
+            content.classList.remove('active'); 
+            content.style.display = 'none'; 
+          });
+          
+          // Add active state to clicked button and show corresponding content
+          button.classList.add('bg-primary-500', 'text-white'); 
+          button.classList.remove('text-gray-400');
+          
+          const tabId = button.getAttribute('data-tab'); 
+          const tabContent = document.getElementById(tabId);
+          if (tabContent) { 
+            tabContent.classList.add('active'); 
+            tabContent.style.display = 'block'; 
+          }
         });
       });
     }
+    
     function setupCODOptionsDisplay() {
-      const reasoningRadios = document.getElementsByName('reasoningMethod'); const codOptionsDisplay = document.getElementById('codOptions'); if (!codOptionsDisplay) return;
-      const updateDisplay = () => { const selectedReasoning = document.querySelector('input[name="reasoningMethod"]:checked'); if (selectedReasoning && selectedReasoning.value === 'cod') { codOptionsDisplay.style.display = 'block'; } else { codOptionsDisplay.style.display = 'none'; }};
-      updateDisplay(); reasoningRadios.forEach(radio => radio.addEventListener('change', updateDisplay));
+      const reasoningRadios = document.getElementsByName('reasoningMethod'); 
+      const codOptionsDisplay = document.getElementById('codOptions'); 
+      if (!codOptionsDisplay) return;
+      
+      const updateDisplay = () => { 
+        const selectedReasoning = document.querySelector('input[name="reasoningMethod"]:checked'); 
+        if (selectedReasoning && selectedReasoning.value === 'cod') { 
+          codOptionsDisplay.style.display = 'block'; 
+        } else { 
+          codOptionsDisplay.style.display = 'none'; 
+        }
+      };
+      
+      updateDisplay(); 
+      reasoningRadios.forEach(radio => radio.addEventListener('change', updateDisplay));
+      
       const selfReflectionToggle = document.getElementById('selfReflectionToggle');
-      if (selfReflectionToggle) { selfReflectionToggle.addEventListener('change', () => { SELF_REFLECTION_ENABLED = selfReflectionToggle.checked; updateCoDPrompt(); }); }
+      if (selfReflectionToggle) { 
+        selfReflectionToggle.addEventListener('change', () => { 
+          SELF_REFLECTION_ENABLED = selfReflectionToggle.checked; 
+          updateCoDPrompt(); 
+        }); 
+      }
     }
 
     function updateCoDPrompt() {
-        let basePrompt = `You are an AI assistant. Your goal is to solve problems by thinking step-by-step.
+      let basePrompt = `You are an AI assistant. Your goal is to solve problems by thinking step-by-step.
 When using Chain of Draft (CoD), adhere to the following structure for the thinking part of your response (before the '####' separator):
 
 1.  **Concise CoD Steps:** Use very short, concise steps (target 15-25 words per step). Separate each CoD step with a period. Use mathematical notation where possible. Focus on key calculations and essential intermediate results.
@@ -1209,7 +1515,7 @@ CoD Step 6. CoD Step 7.
 DETAILED REFLECTION 3: [This is my final detailed review before concluding the thinking phase. I have E. I will quickly re-scan all CoD steps and previous detailed reflections. Step 1 was X. Step 2 was Y. Reflection 1 confirmed Z. Step 4 was P. Reflection 2 confirmed Q. All seems consistent. I am now ready to formulate the final answer.]
 `;
 
-    const examplesCoDSteps = `
+      const examplesCoDSteps = `
 Some examples of individual concise CoD steps (NOT detailed reflections):
 Example Problem 1: Jason had 20 lollipops. He gave Denny some. Now Jason has 12. How many did he give?
 CoD Step: Initial lollipops: 20.
@@ -1224,105 +1530,405 @@ CoD Step: Birthday money received: $25.
 CoD Step: Final money: $70 + $25 = $95.
 `;
 
-    let finalAnswerInstruction = `
+      let finalAnswerInstruction = `
 After all CoD steps and all three DETAILED REFLECTION blocks (and the optional brief final reflection, if applicable), write your final answer after the '####' separator. This final answer must be comprehensive and detailed, fully explaining the solution, the steps taken, and the reasoning behind them. Do not be brief in the final answer.`;
 
-    if (SELF_REFLECTION_ENABLED) { 
+      if (SELF_REFLECTION_ENABLED) { 
         basePrompt += `\nJust before the '####' separator (after all CoD steps and all three DETAILED REFLECTION blocks), add a very brief final self-check reflection starting with 'Reflection:'. This final brief reflection should be concise (around 15-25 words), e.g., "Reflection: All calculations checked, units are consistent, answer seems logical."`;
+      }
+      
+      PROMPTS.cod = basePrompt + examplesCoDSteps + finalAnswerInstruction;
     }
-    
-    PROMPTS.cod = basePrompt + examplesCoDSteps + finalAnswerInstruction;
-}
     
     function setupMcpToolsOptions() {
       const toolCheckboxes = document.querySelectorAll('input[name="mcp_tools"]');
       toolCheckboxes.forEach(checkbox => {
-        const toolName = checkbox.value; checkbox.checked = ENABLED_MCP_TOOLS.includes(toolName) || (toolName === "tavily_search" && enableWebSearchQuickToggle);
+        const toolName = checkbox.value; 
+        checkbox.checked = ENABLED_MCP_TOOLS.includes(toolName) || (toolName === "tavily_search" && enableWebSearchQuickToggle);
+        
         checkbox.addEventListener('change', () => {
-          if (checkbox.checked) { if (!ENABLED_MCP_TOOLS.includes(toolName)) ENABLED_MCP_TOOLS.push(toolName); if (toolName === "tavily_search") enableWebSearchQuickToggle = true; }
-          else { ENABLED_MCP_TOOLS = ENABLED_MCP_TOOLS.filter(tool => tool !== toolName); if (toolName === "tavily_search") enableWebSearchQuickToggle = false; }
-          localStorage.setItem('enabledMcpTools', JSON.stringify(ENABLED_MCP_TOOLS)); localStorage.setItem('enableWebSearchQuickToggle', enableWebSearchQuickToggle.toString()); updateWebSearchButtonAppearance();
+          if (checkbox.checked) { 
+            if (!ENABLED_MCP_TOOLS.includes(toolName)) {
+              ENABLED_MCP_TOOLS.push(toolName); 
+            }
+            if (toolName === "tavily_search") {
+              enableWebSearchQuickToggle = true; 
+            }
+          } else { 
+            ENABLED_MCP_TOOLS = ENABLED_MCP_TOOLS.filter(tool => tool !== toolName); 
+            if (toolName === "tavily_search") {
+              enableWebSearchQuickToggle = false; 
+            }
+          }
+          localStorage.setItem('enabledMcpTools', JSON.stringify(ENABLED_MCP_TOOLS)); 
+          localStorage.setItem('enableWebSearchQuickToggle', enableWebSearchQuickToggle.toString()); 
+          updateWebSearchButtonAppearance();
         });
       });
     }
+    
     function setupSliders() {
       document.querySelectorAll('input[type="range"]').forEach(slider => {
         const valueDisplay = document.getElementById(`${slider.id}Value`);
-        if (valueDisplay) { valueDisplay.textContent = slider.value; updateRangeColor(slider); slider.addEventListener('input', () => { valueDisplay.textContent = slider.value; updateRangeColor(slider); });}
+        if (valueDisplay) { 
+          valueDisplay.textContent = slider.value; 
+          updateRangeColor(slider); 
+          slider.addEventListener('input', () => { 
+            valueDisplay.textContent = slider.value; 
+            updateRangeColor(slider); 
+          });
+        }
       });
     }
-    function updateRangeColor(slider) { const min = parseFloat(slider.min) || 0; const max = parseFloat(slider.max) || 1; const value = parseFloat(slider.value) || 0; const percent = ((value - min) / (max - min)) * 100; slider.style.setProperty('--value-percent', `${percent}%`);}
+    
+    function updateRangeColor(slider) { 
+      const min = parseFloat(slider.min) || 0; 
+      const max = parseFloat(slider.max) || 1; 
+      const value = parseFloat(slider.value) || 0; 
+      const percent = ((value - min) / (max - min)) * 100; 
+      slider.style.setProperty('--value-percent', `${percent}%`);
+    }
+    
     function openSettingsModal() {
-      const reasoningRadio = document.getElementById(`${REASONING_METHOD}Reasoning`); if (reasoningRadio) reasoningRadio.checked = true;
-      const selfReflectionToggle = document.getElementById('selfReflectionToggle'); if (selfReflectionToggle) selfReflectionToggle.checked = SELF_REFLECTION_ENABLED;
-      setSliderAndValue("temp", TEMPERATURE); setSliderAndValue("topP", TOP_P); setSliderAndValue("topK", TOP_K); setSliderAndValue("maxTokens", MAX_TOKENS); setSliderAndValue("presencePenalty", PRESENCE_PENALTY); setSliderAndValue("frequencyPenalty", FREQUENCY_PENALTY);
-      setupCODOptionsDisplay(); setupMcpToolsOptions();
-      const streamingToggle = document.getElementById('streamingToggle'); if (streamingToggle) streamingToggle.checked = ENABLE_STREAMING;
-      const modal = document.getElementById("settingsModal"); if (modal) modal.style.display = "flex";
-      const tabButtons = document.querySelectorAll('.tab-btn'); const tabContents = document.querySelectorAll('.tab-content');
-      tabContents.forEach(content => { content.classList.remove('active'); content.style.display = 'none'; });
-      tabButtons.forEach(btn => { btn.classList.remove('bg-primary-500', 'text-white'); btn.classList.add('text-gray-400'); });
-      const parametersTabBtn = document.querySelector('.tab-btn[data-tab="parametersTab"]'); const parametersTab = document.getElementById('parametersTab');
-      if (parametersTabBtn && parametersTab) { parametersTabBtn.classList.add('bg-primary-500', 'text-white'); parametersTabBtn.classList.remove('text-gray-400'); parametersTab.classList.add('active'); parametersTab.style.display = 'block'; }
+      const reasoningRadio = document.getElementById(`${REASONING_METHOD}Reasoning`); 
+      if (reasoningRadio) reasoningRadio.checked = true;
+      
+      const selfReflectionToggle = document.getElementById('selfReflectionToggle'); 
+      if (selfReflectionToggle) selfReflectionToggle.checked = SELF_REFLECTION_ENABLED;
+      
+      setSliderAndValue("temp", TEMPERATURE); 
+      setSliderAndValue("topP", TOP_P); 
+      setSliderAndValue("topK", TOP_K); 
+      setSliderAndValue("maxTokens", MAX_TOKENS); 
+      setSliderAndValue("presencePenalty", PRESENCE_PENALTY); 
+      setSliderAndValue("frequencyPenalty", FREQUENCY_PENALTY);
+      
+      setupCODOptionsDisplay(); 
+      setupMcpToolsOptions();
+      
+      const streamingToggle = document.getElementById('streamingToggle'); 
+      if (streamingToggle) streamingToggle.checked = ENABLE_STREAMING;
+      
+      const modal = document.getElementById("settingsModal"); 
+      if (modal) modal.style.display = "flex";
+      
+      // Set default tab to Parameters
+      const tabButtons = document.querySelectorAll('.tab-btn'); 
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabContents.forEach(content => { 
+        content.classList.remove('active'); 
+        content.style.display = 'none'; 
+      });
+      
+      tabButtons.forEach(btn => { 
+        btn.classList.remove('bg-primary-500', 'text-white'); 
+        btn.classList.add('text-gray-400'); 
+      });
+      
+      const parametersTabBtn = document.querySelector('.tab-btn[data-tab="parametersTab"]'); 
+      const parametersTab = document.getElementById('parametersTab');
+      if (parametersTabBtn && parametersTab) { 
+        parametersTabBtn.classList.add('bg-primary-500', 'text-white'); 
+        parametersTabBtn.classList.remove('text-gray-400'); 
+        parametersTab.classList.add('active'); 
+        parametersTab.style.display = 'block'; 
+      }
     }
-    function setSliderAndValue(id, value) { const slider = document.getElementById(id); const valueDisplay = document.getElementById(`${id}Value`); if (slider) { slider.value = value; updateRangeColor(slider); } if (valueDisplay) valueDisplay.textContent = value; }
-    function closeSettingsModal() { const modal = document.getElementById("settingsModal"); if (modal) modal.style.display = "none"; }
+    
+    function setSliderAndValue(id, value) { 
+      const slider = document.getElementById(id); 
+      const valueDisplay = document.getElementById(`${id}Value`); 
+      if (slider) { 
+        slider.value = value; 
+        updateRangeColor(slider); 
+      } 
+      if (valueDisplay) valueDisplay.textContent = value; 
+    }
+    
+    function closeSettingsModal() { 
+      const modal = document.getElementById("settingsModal"); 
+      if (modal) modal.style.display = "none"; 
+    }
+    
     function saveSettings() {
-      const streamingToggle = document.getElementById('streamingToggle'); if (streamingToggle) { ENABLE_STREAMING = streamingToggle.checked; localStorage.setItem('streamingEnabled', ENABLE_STREAMING.toString()); }
-      const reasoningRadios = document.getElementsByName("reasoningMethod"); for (const radio of reasoningRadios) if (radio.checked) REASONING_METHOD = radio.value;
-      const selfReflectionToggle = document.getElementById('selfReflectionToggle'); if (selfReflectionToggle) SELF_REFLECTION_ENABLED = selfReflectionToggle.checked;
-      TEMPERATURE = parseFloat(document.getElementById("temp").value); if (TEMPERATURE === 0 && document.getElementById("temp").min === "0") TEMPERATURE = 0.01;
-      TOP_P = parseFloat(document.getElementById("topP").value); TOP_K = parseInt(document.getElementById("topK").value); PRESENCE_PENALTY = parseFloat(document.getElementById("presencePenalty").value); FREQUENCY_PENALTY = parseFloat(document.getElementById("frequencyPenalty").value); MAX_TOKENS = parseInt(document.getElementById("maxTokens").value);
-      ENABLED_MCP_TOOLS = []; document.querySelectorAll('input[name="mcp_tools"]').forEach(checkbox => { if (checkbox.checked) ENABLED_MCP_TOOLS.push(checkbox.value); });
-      if (ENABLED_MCP_TOOLS.includes("tavily_search")) enableWebSearchQuickToggle = true; else enableWebSearchQuickToggle = false;
-      localStorage.setItem("reasoningMethod", REASONING_METHOD); localStorage.setItem("selfReflectionEnabled", SELF_REFLECTION_ENABLED.toString()); localStorage.setItem("temperature", TEMPERATURE.toString()); localStorage.setItem("topP", TOP_P.toString()); localStorage.setItem("topK", TOP_K.toString()); localStorage.setItem("presencePenalty", PRESENCE_PENALTY.toString()); localStorage.setItem("frequencyPenalty", FREQUENCY_PENALTY.toString()); localStorage.setItem("maxTokens", MAX_TOKENS.toString()); localStorage.setItem("enabledMcpTools", JSON.stringify(ENABLED_MCP_TOOLS)); localStorage.setItem("enableWebSearchQuickToggle", enableWebSearchQuickToggle.toString());
-      updateCoDPrompt(); updateWebSearchButtonAppearance(); closeSettingsModal(); showNotification("Settings saved");
+      const streamingToggle = document.getElementById('streamingToggle'); 
+      if (streamingToggle) { 
+        ENABLE_STREAMING = streamingToggle.checked; 
+        localStorage.setItem('streamingEnabled', ENABLE_STREAMING.toString()); 
+      }
+      
+      const reasoningRadios = document.getElementsByName("reasoningMethod"); 
+      for (const radio of reasoningRadios) {
+        if (radio.checked) REASONING_METHOD = radio.value;
+      }
+      
+      const selfReflectionToggle = document.getElementById('selfReflectionToggle'); 
+      if (selfReflectionToggle) SELF_REFLECTION_ENABLED = selfReflectionToggle.checked;
+      
+      TEMPERATURE = parseFloat(document.getElementById("temp").value); 
+      if (TEMPERATURE === 0 && document.getElementById("temp").min === "0") TEMPERATURE = 0.01;
+      TOP_P = parseFloat(document.getElementById("topP").value); 
+      TOP_K = parseInt(document.getElementById("topK").value); 
+      PRESENCE_PENALTY = parseFloat(document.getElementById("presencePenalty").value); 
+      FREQUENCY_PENALTY = parseFloat(document.getElementById("frequencyPenalty").value); 
+      MAX_TOKENS = parseInt(document.getElementById("maxTokens").value);
+      
+      ENABLED_MCP_TOOLS = []; 
+      document.querySelectorAll('input[name="mcp_tools"]').forEach(checkbox => { 
+        if (checkbox.checked) ENABLED_MCP_TOOLS.push(checkbox.value); 
+      });
+      
+      if (ENABLED_MCP_TOOLS.includes("tavily_search")) {
+        enableWebSearchQuickToggle = true; 
+      } else {
+        enableWebSearchQuickToggle = false;
+      }
+      
+      localStorage.setItem("reasoningMethod", REASONING_METHOD); 
+      localStorage.setItem("selfReflectionEnabled", SELF_REFLECTION_ENABLED.toString()); 
+      localStorage.setItem("temperature", TEMPERATURE.toString()); 
+      localStorage.setItem("topP", TOP_P.toString()); 
+      localStorage.setItem("topK", TOP_K.toString()); 
+      localStorage.setItem("presencePenalty", PRESENCE_PENALTY.toString()); 
+      localStorage.setItem("frequencyPenalty", FREQUENCY_PENALTY.toString()); 
+      localStorage.setItem("maxTokens", MAX_TOKENS.toString()); 
+      localStorage.setItem("enabledMcpTools", JSON.stringify(ENABLED_MCP_TOOLS)); 
+      localStorage.setItem("enableWebSearchQuickToggle", enableWebSearchQuickToggle.toString());
+      
+      updateCoDPrompt(); 
+      updateWebSearchButtonAppearance(); 
+      closeSettingsModal(); 
+      showNotification("Settings saved");
     }
+    
     function updateWebSearchButtonAppearance() {
-        const btn = document.getElementById('webSearchBtn'); if (!btn) return;
-        if (enableWebSearchQuickToggle) { btn.classList.add('bg-primary-500', 'text-white'); btn.classList.remove('bg-dark-500', 'text-gray-300'); btn.title = "Tavily Web Search enabled"; }
-        else { btn.classList.remove('bg-primary-500', 'text-white'); btn.classList.add('bg-dark-500', 'text-gray-300'); btn.title = "Tavily Web Search disabled"; }
+      const btn = document.getElementById('webSearchBtn'); 
+      if (!btn) return;
+      
+      if (enableWebSearchQuickToggle) { 
+        btn.classList.add('bg-primary-500', 'text-white'); 
+        btn.classList.remove('bg-dark-500', 'text-gray-300'); 
+        btn.title = "Tavily Web Search enabled"; 
+      } else { 
+        btn.classList.remove('bg-primary-500', 'text-white'); 
+        btn.classList.add('bg-dark-500', 'text-gray-300'); 
+        btn.title = "Tavily Web Search disabled"; 
+      }
     }
+    
     function initMobileNavigation() {
-      const mobileSidebarToggle = document.getElementById('mobileSidebarToggle'); const mobileSidebar = document.getElementById('mobileSidebar'); const closeMobileSidebar = document.getElementById('closeMobileSidebar');
-      if (mobileSidebarToggle && mobileSidebar) mobileSidebarToggle.addEventListener('click', () => { mobileSidebar.classList.remove('-translate-x-full'); mobileSidebar.classList.add('translate-x-0'); });
-      if (closeMobileSidebar && mobileSidebar) closeMobileSidebar.addEventListener('click', () => { mobileSidebar.classList.remove('translate-x-0'); mobileSidebar.classList.add('-translate-x-full'); });
-      document.getElementById('mobileNewThreadBtn')?.addEventListener('click', () => { createNewThread(); mobileSidebar.classList.remove('translate-x-0'); mobileSidebar.classList.add('-translate-x-full'); });
-      document.getElementById('mobileDeleteThreadBtn')?.addEventListener('click', () => { deleteCurrentThread(); mobileSidebar.classList.remove('translate-x-0'); mobileSidebar.classList.add('-translate-x-full'); });
-      document.getElementById('mobileDownloadTxtBtn')?.addEventListener('click', () => { downloadCurrentThreadAsTxt(); mobileSidebar.classList.remove('translate-x-0'); mobileSidebar.classList.add('-translate-x-full'); });
-      document.getElementById('mobileClearThreadBtn')?.addEventListener('click', () => { if (confirm("Clear all messages in this thread?")) { const thread = threads.find(t => t.id === currentThreadId); if (thread) { thread.messages = []; renderCurrentThreadMessages(); showNotification("Thread cleared"); }} mobileSidebar.classList.remove('translate-x-0'); mobileSidebar.classList.add('-translate-x-full'); });
+      const mobileSidebarToggle = document.getElementById('mobileSidebarToggle'); 
+      const mobileSidebar = document.getElementById('mobileSidebar'); 
+      const closeMobileSidebar = document.getElementById('closeMobileSidebar');
+      
+      if (mobileSidebarToggle && mobileSidebar) {
+        mobileSidebarToggle.addEventListener('click', () => { 
+          mobileSidebar.classList.remove('-translate-x-full'); 
+          mobileSidebar.classList.add('translate-x-0'); 
+        });
+      }
+      
+      if (closeMobileSidebar && mobileSidebar) {
+        closeMobileSidebar.addEventListener('click', () => { 
+          mobileSidebar.classList.remove('translate-x-0'); 
+          mobileSidebar.classList.add('-translate-x-full'); 
+        });
+      }
+      
+      document.getElementById('mobileNewThreadBtn')?.addEventListener('click', () => { 
+        createNewThread(); 
+        mobileSidebar.classList.remove('translate-x-0'); 
+        mobileSidebar.classList.add('-translate-x-full'); 
+      });
+      
+      document.getElementById('mobileDeleteThreadBtn')?.addEventListener('click', () => { 
+        deleteCurrentThread(); 
+        mobileSidebar.classList.remove('translate-x-0'); 
+        mobileSidebar.classList.add('-translate-x-full'); 
+      });
+      
+      document.getElementById('mobileDownloadTxtBtn')?.addEventListener('click', () => { 
+        downloadCurrentThreadAsTxt(); 
+        mobileSidebar.classList.remove('translate-x-0'); 
+        mobileSidebar.classList.add('-translate-x-full'); 
+      });
+      
+      document.getElementById('mobileClearThreadBtn')?.addEventListener('click', () => { 
+        if (confirm("Clear all messages in this thread?")) { 
+          const thread = threads.find(t => t.id === currentThreadId); 
+          if (thread) { 
+            thread.messages = []; 
+            renderCurrentThreadMessages(); 
+            showNotification("Thread cleared"); 
+          }
+        } 
+        mobileSidebar.classList.remove('translate-x-0'); 
+        mobileSidebar.classList.add('-translate-x-full'); 
+      });
     }
+    
     function loadPersistedSettings() {
       REASONING_METHOD = localStorage.getItem("reasoningMethod") || "cod";
-      const selfReflection = localStorage.getItem("selfReflectionEnabled"); if (selfReflection !== null) SELF_REFLECTION_ENABLED = selfReflection === "true"; else SELF_REFLECTION_ENABLED = true; 
-      const temp = localStorage.getItem("temperature"); if (temp) TEMPERATURE = parseFloat(temp);
-      const topP = localStorage.getItem("topP"); if (topP) TOP_P = parseFloat(topP);
-      const topK = localStorage.getItem("topK"); if (topK) TOP_K = parseInt(topK); else TOP_K = 40;
-      const presencePenalty = localStorage.getItem("presencePenalty"); if (presencePenalty) PRESENCE_PENALTY = parseFloat(presencePenalty);
-      const frequencyPenalty = localStorage.getItem("frequencyPenalty"); if (frequencyPenalty) FREQUENCY_PENALTY = parseFloat(frequencyPenalty);
-      const maxTokens = localStorage.getItem("maxTokens"); if (maxTokens) MAX_TOKENS = parseInt(maxTokens); else MAX_TOKENS = 4096;
-      const streaming = localStorage.getItem('streamingEnabled'); if (streaming !== null) ENABLE_STREAMING = streaming === 'true'; else ENABLE_STREAMING = true;
-      const mcpTools = localStorage.getItem('enabledMcpTools'); if (mcpTools) { try { ENABLED_MCP_TOOLS = JSON.parse(mcpTools); } catch(e) { ENABLED_MCP_TOOLS = []; }} else { ENABLED_MCP_TOOLS = []; }
-      const webSearchToggle = localStorage.getItem('enableWebSearchQuickToggle'); if (webSearchToggle !== null) enableWebSearchQuickToggle = webSearchToggle === 'true'; else enableWebSearchQuickToggle = false;
+      
+      const selfReflection = localStorage.getItem("selfReflectionEnabled"); 
+      if (selfReflection !== null) {
+        SELF_REFLECTION_ENABLED = selfReflection === "true"; 
+      } else {
+        SELF_REFLECTION_ENABLED = true; 
+      }
+      
+      const temp = localStorage.getItem("temperature"); 
+      if (temp) TEMPERATURE = parseFloat(temp);
+      
+      const topP = localStorage.getItem("topP"); 
+      if (topP) TOP_P = parseFloat(topP);
+      
+      const topK = localStorage.getItem("topK"); 
+      if (topK) {
+        TOP_K = parseInt(topK); 
+      } else {
+        TOP_K = 40;
+      }
+      
+      const presencePenalty = localStorage.getItem("presencePenalty"); 
+      if (presencePenalty) PRESENCE_PENALTY = parseFloat(presencePenalty);
+      
+      const frequencyPenalty = localStorage.getItem("frequencyPenalty"); 
+      if (frequencyPenalty) FREQUENCY_PENALTY = parseFloat(frequencyPenalty);
+      
+      const maxTokens = localStorage.getItem("maxTokens"); 
+      if (maxTokens) {
+        MAX_TOKENS = parseInt(maxTokens); 
+      } else {
+        MAX_TOKENS = 4096;
+      }
+      
+      const streaming = localStorage.getItem('streamingEnabled'); 
+      if (streaming !== null) {
+        ENABLE_STREAMING = streaming === 'true'; 
+      } else {
+        ENABLE_STREAMING = true;
+      }
+      
+      const mcpTools = localStorage.getItem('enabledMcpTools'); 
+      if (mcpTools) { 
+        try { 
+          ENABLED_MCP_TOOLS = JSON.parse(mcpTools); 
+        } catch(e) { 
+          ENABLED_MCP_TOOLS = []; 
+        }
+      } else { 
+        ENABLED_MCP_TOOLS = []; 
+      }
+      
+      const webSearchToggle = localStorage.getItem('enableWebSearchQuickToggle'); 
+      if (webSearchToggle !== null) {
+        enableWebSearchQuickToggle = webSearchToggle === 'true'; 
+      } else {
+        enableWebSearchQuickToggle = false;
+      }
+      
       updateCoDPrompt(); 
     }
-    function initApp() { loadPersistedSettings(); createNewThread(); initEventListeners(); initMobileNavigation(); updateWebSearchButtonAppearance(); }
-    function initEventListeners() {
-      const addListener = (id, event, handler) => { const element = document.getElementById(id); if (element) element.addEventListener(event, handler); else console.warn(`Element "${id}" not found`); };
-      addListener("openSettings", "click", openSettingsModal); addListener("closeSettings", "click", closeSettingsModal); addListener("closeModalX", "click", closeSettingsModal); addListener("saveSettings", "click", saveSettings);
-      addListener("newThreadBtn", "click", createNewThread); addListener("deleteThreadBtn", "click", deleteCurrentThread); addListener("downloadTxtBtn", "click", downloadCurrentThreadAsTxt);
-      addListener("clearThreadBtn", "click", () => { if (confirm("Clear messages?")) { const thread = threads.find(t => t.id === currentThreadId); if (thread) { thread.messages = []; renderCurrentThreadMessages(); showNotification("Thread cleared"); }}});
-      addListener("webSearchBtn", "click", toggleWebSearchQuickButton);
-      const textarea = document.getElementById('userInput');
-      if (textarea) { textarea.addEventListener('input', () => { textarea.style.height = 'auto'; textarea.style.height = (textarea.scrollHeight) + 'px'; }); textarea.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('sendBtn')?.click(); }});}
-      addListener("sendBtn", "click", () => { const textarea = document.getElementById('userInput'); if (textarea) { const message = textarea.value.trim(); if (message || attachedFiles.length > 0) { sendMessage(message); textarea.value = ''; textarea.style.height = 'auto'; }}});
-      handleFileInput();
-      window.addEventListener("click", (event) => { const settingsModal = document.getElementById("settingsModal"); if (settingsModal && event.target === settingsModal) closeSettingsModal(); });
-      setTimeout(() => { setupTabNavigation(); setupCODOptionsDisplay(); setupMcpToolsOptions(); setupSliders(); }, 100);
+    
+    function initApp() { 
+      loadPersistedSettings(); 
+      createNewThread(); 
+      initEventListeners(); 
+      initMobileNavigation(); 
+      updateWebSearchButtonAppearance(); 
     }
+    
+    function initEventListeners() {
+      const addListener = (id, event, handler) => { 
+        const element = document.getElementById(id); 
+        if (element) {
+          element.addEventListener(event, handler); 
+        } else {
+          console.warn(`Element "${id}" not found`); 
+        }
+      };
+      
+      addListener("openSettings", "click", openSettingsModal); 
+      addListener("closeSettings", "click", closeSettingsModal); 
+      addListener("closeModalX", "click", closeSettingsModal); 
+      addListener("saveSettings", "click", saveSettings);
+      
+      addListener("newThreadBtn", "click", createNewThread); 
+      addListener("deleteThreadBtn", "click", deleteCurrentThread); 
+      addListener("downloadTxtBtn", "click", downloadCurrentThreadAsTxt);
+      
+      addListener("clearThreadBtn", "click", () => { 
+        if (confirm("Clear messages?")) { 
+          const thread = threads.find(t => t.id === currentThreadId); 
+          if (thread) { 
+            thread.messages = []; 
+            renderCurrentThreadMessages(); 
+            showNotification("Thread cleared"); 
+          }
+        }
+      });
+      
+      addListener("webSearchBtn", "click", toggleWebSearchQuickButton);
+      
+      const textarea = document.getElementById('userInput');
+      if (textarea) { 
+        textarea.addEventListener('input', () => { 
+          textarea.style.height = 'auto'; 
+          textarea.style.height = (textarea.scrollHeight) + 'px'; 
+        }); 
+        
+        textarea.addEventListener('keydown', (e) => { 
+          if (e.key === 'Enter' && !e.shiftKey) { 
+            e.preventDefault(); 
+            document.getElementById('sendBtn')?.click(); 
+          }
+        });
+      }
+      
+      addListener("sendBtn", "click", () => { 
+        const textarea = document.getElementById('userInput'); 
+        if (textarea) { 
+          const message = textarea.value.trim(); 
+          if (message || attachedFiles.length > 0) { 
+            sendMessage(message); 
+            textarea.value = ''; 
+            textarea.style.height = 'auto'; 
+          }
+        }
+      });
+      
+      handleFileInput();
+      
+      window.addEventListener("click", (event) => { 
+        const settingsModal = document.getElementById("settingsModal"); 
+        if (settingsModal && event.target === settingsModal) {
+          closeSettingsModal(); 
+        }
+      });
+      
+      setTimeout(() => { 
+        setupTabNavigation(); 
+        setupCODOptionsDisplay(); 
+        setupMcpToolsOptions(); 
+        setupSliders(); 
+      }, 100);
+    }
+    
     document.addEventListener("DOMContentLoaded", async function() {
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark');
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => { if (event.matches) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); });
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+      
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => { 
+        if (event.matches) {
+          document.documentElement.classList.add('dark'); 
+        } else {
+          document.documentElement.classList.remove('dark'); 
+        }
+      });
+      
       initApp();
     });
   </script>
