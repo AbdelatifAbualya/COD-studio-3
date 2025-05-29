@@ -1,6 +1,6 @@
 {
   "name": "cod-studio-3",
-  "version": "1.0.0",
+  "version": "42.2.0",
   "description": "AI Reasoning Studio with Chain of Draft methodology",
   "main": "index.html",
   "scripts": {
