@@ -41,17 +41,19 @@ module.exports = async (req, res) => {
       model, 
       messageCount: messages.length, 
       stream: !!stream,
-      toolsEnabled: !!(tools && tools.length > 0)
+      toolsEnabled: !!(tools && tools.length > 0),
+      temperature: temperature
     });
 
     // Prepare the request to Fireworks API
     const fireworksPayload = {
       model,
       messages,
-      temperature: temperature || 0.6,
-      top_p: top_p || 1,
+      // DeepSeek-V3-0324 optimized parameters
+      temperature: temperature || 0.3, // DeepSeek optimized default
+      top_p: top_p || 0.9,
       top_k: top_k || 40,
-      max_tokens: max_tokens || 4096,
+      max_tokens: max_tokens || 8192,
       presence_penalty: presence_penalty || 0,
       frequency_penalty: frequency_penalty || 0,
       stream: stream || false
@@ -67,7 +69,8 @@ module.exports = async (req, res) => {
 
     const fireworksHeaders = {
       'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'User-Agent': 'Advanced-CoD-Studio/1.0'
     };
 
     // Handle streaming responses
@@ -82,10 +85,21 @@ module.exports = async (req, res) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Fireworks API Error:', response.status, errorText);
+        console.error('Fireworks API Error (Streaming):', response.status, errorText);
+        
+        // Handle specific DeepSeek-V3-0324 errors
+        let errorMessage = errorText;
+        if (response.status === 429) {
+          errorMessage = 'Rate limit exceeded. DeepSeek-V3-0324 has usage limits.';
+        } else if (response.status === 401) {
+          errorMessage = 'Invalid API key or insufficient permissions for DeepSeek-V3-0324.';
+        } else if (response.status === 400) {
+          errorMessage = 'Invalid request format for DeepSeek-V3-0324. Check parameters.';
+        }
+        
         return res.status(response.status).json({ 
           error: 'API request failed',
-          message: errorText 
+          message: errorMessage 
         });
       }
 
@@ -98,7 +112,7 @@ module.exports = async (req, res) => {
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
       if (!response.body) {
-        return res.status(500).json({ error: 'No response body from API' });
+        return res.status(500).json({ error: 'No response body from DeepSeek-V3-0324 API' });
       }
 
       // Handle streaming with proper async iteration
@@ -115,7 +129,7 @@ module.exports = async (req, res) => {
         }
         res.end();
       } catch (error) {
-        console.error('Streaming error:', error);
+        console.error('Streaming error with DeepSeek-V3-0324:', error);
         res.write(`data: {"error": "Streaming interrupted"}\n\n`);
         res.end();
       }
@@ -130,22 +144,54 @@ module.exports = async (req, res) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Fireworks API Error:', response.status, errorText);
+        console.error('Fireworks API Error (Non-streaming):', response.status, errorText);
+        
+        // Handle specific DeepSeek-V3-0324 errors
+        let errorMessage = errorText;
+        if (response.status === 429) {
+          errorMessage = 'Rate limit exceeded. DeepSeek-V3-0324 has usage limits.';
+        } else if (response.status === 401) {
+          errorMessage = 'Invalid API key or insufficient permissions for DeepSeek-V3-0324.';
+        } else if (response.status === 400) {
+          errorMessage = 'Invalid request format for DeepSeek-V3-0324. Check parameters.';
+        } else if (response.status === 503) {
+          errorMessage = 'DeepSeek-V3-0324 service temporarily unavailable. Try again later.';
+        }
+        
         return res.status(response.status).json({ 
           error: 'API request failed',
-          message: errorText 
+          message: errorMessage 
         });
       }
 
       const data = await response.json();
+      
+      // Log DeepSeek-V3-0324 usage stats
+      if (data.usage) {
+        console.log('DeepSeek-V3-0324 Usage:', {
+          prompt_tokens: data.usage.prompt_tokens,
+          completion_tokens: data.usage.completion_tokens,
+          total_tokens: data.usage.total_tokens
+        });
+      }
+      
       return res.status(200).json(data);
     }
 
   } catch (error) {
-    console.error('Server error:', error);
+    console.error('Server error with DeepSeek-V3-0324:', error);
+    
+    // Enhanced error handling for DeepSeek-V3-0324
+    let errorMessage = error.message;
+    if (error.message.includes('fetch')) {
+      errorMessage = 'Network error connecting to DeepSeek-V3-0324. Check your internet connection.';
+    } else if (error.message.includes('timeout')) {
+      errorMessage = 'Request timeout with DeepSeek-V3-0324. The model may be processing a complex request.';
+    }
+    
     return res.status(500).json({ 
       error: 'Internal server error',
-      message: error.message 
+      message: errorMessage 
     });
   }
 };
