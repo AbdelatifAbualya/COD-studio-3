@@ -174,21 +174,101 @@
 <body class="bg-dark-800 text-gray-100 font-sans min-h-screen overflow-hidden">
   <div class="flex h-screen">
     <!-- Sidebar -->
-    <div class="w-72 bg-dark-700 border-r border-dark-600 flex flex-col p-4 overflow-y-auto hidden md:flex">
-      <h2 class="text-xl font-semibold mb-4">Threads</h2>
-      <ul id="threadList" class="flex-1 space-y-1 mb-4">
-        <li class="bg-dark-600 text-primary-300 px-3 py-2 rounded-md cursor-pointer hover:bg-dark-500 transition">Thread 1</li>
-      </ul>
-      <div class="space-y-2">
-        <button id="newThreadBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 px-4 rounded-md transition flex items-center justify-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="w-80 bg-gradient-to-b from-dark-700 to-dark-800 border-r border-dark-600 flex flex-col overflow-y-auto hidden md:flex shadow-2xl">
+      <!-- Header -->
+      <div class="p-6 border-b border-dark-600/50">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-white">CoD Studio</h2>
+            <p class="text-xs text-gray-400">Chain of Draft AI</p>
+          </div>
+        </div>
+        
+        <!-- New Session Button -->
+        <button id="newThreadBtn" class="w-full bg-gradient-to-r from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 text-white py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
           </svg>
-          New Thread
+          <span class="font-medium">New Session</span>
         </button>
-        <button id="deleteThreadBtn" class="w-full bg-dark-600 hover:bg-dark-500 text-gray-300 py-2 px-4 rounded-md transition">Delete Thread</button>
-        <button id="downloadTxtBtn" class="w-full bg-dark-600 hover:bg-dark-500 text-gray-300 py-2 px-4 rounded-md transition">Download TXT</button>
-        <button id="clearThreadBtn" class="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 py-2 px-4 rounded-md transition">Clear Thread</button>
+      </div>
+
+      <!-- Threads Section -->
+      <div class="flex-1 p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-medium text-gray-300 uppercase tracking-wider">Recent Threads</h3>
+          <span id="threadCount" class="text-xs bg-dark-600 text-gray-400 px-2 py-1 rounded-full">1</span>
+        </div>
+        <ul id="threadList" class="space-y-2 mb-6">
+          <li class="bg-dark-600/50 hover:bg-dark-600 text-primary-300 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 border border-dark-500/50 hover:border-primary-500/50">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-primary-500/20 rounded-lg flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-white truncate">Thread 1</p>
+                <p class="text-xs text-gray-400">Just now</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Export & Actions Section -->
+      <div class="p-4 border-t border-dark-600/50 space-y-3">
+        <div class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+          </svg>
+          Export Research
+        </div>
+        
+        <!-- Export Buttons -->
+        <div class="grid grid-cols-2 gap-2 mb-4">
+          <button id="downloadTxtBtn" class="bg-dark-600 hover:bg-dark-500 text-gray-300 hover:text-white py-3 px-3 rounded-lg transition-all duration-200 flex flex-col items-center gap-1 border border-dark-500 hover:border-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span class="text-xs font-medium">TXT</span>
+          </button>
+          <button id="downloadPdfBtn" class="bg-dark-600 hover:bg-dark-500 text-gray-300 hover:text-white py-3 px-3 rounded-lg transition-all duration-200 flex flex-col items-center gap-1 border border-dark-500 hover:border-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            <span class="text-xs font-medium">PDF</span>
+          </button>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Quick Actions
+        </div>
+        
+        <div class="space-y-2">
+          <button id="clearThreadBtn" class="w-full bg-dark-600 hover:bg-dark-500 text-gray-300 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center gap-3 border border-dark-500 hover:border-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            <span class="text-sm">Clear Session</span>
+          </button>
+          
+          <button id="deleteThreadBtn" class="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center gap-3 border border-red-600/20 hover:border-red-500/50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            <span class="text-sm">Delete Thread</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -258,9 +338,20 @@
 
       <!-- Input Area -->
       <div class="p-4 border-t border-dark-600 bg-dark-700">
+        <!-- Image Preview Area -->
+        <div id="imagePreviewArea" class="mb-4 hidden">
+          <div class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            Attached Images
+          </div>
+          <div id="imagePreviewContainer" class="flex flex-wrap gap-2 mb-3"></div>
+        </div>
+
         <div class="flex items-start gap-3 rounded-xl bg-dark-600 p-3 shadow-lg border border-dark-500 focus-within:border-primary-500 transition">
           <div class="flex-1">
-            <textarea id="userInput" rows="1" class="w-full bg-dark-700 text-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none text-base" placeholder="Ask a complex problem for multi-stage CoD reasoning..."></textarea>
+            <textarea id="userInput" rows="1" class="w-full bg-dark-700 text-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none text-base" placeholder="Ask a complex problem for multi-stage CoD reasoning... (with images if vision enabled)"></textarea>
           </div>
           <div class="flex flex-col gap-2 mt-1">
             <button id="sendBtn" class="bg-primary-500 hover:bg-primary-600 text-white p-3 rounded-lg transition">
@@ -268,20 +359,46 @@
                 <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
               </svg>
             </button>
-            <label for="fileInput" class="bg-dark-500 hover:bg-dark-400 text-gray-300 p-2 rounded-lg cursor-pointer transition">
+            <label for="imageInput" class="bg-purple-600 hover:bg-purple-700 text-white p-2.5 rounded-lg cursor-pointer transition" title="Upload Images (Vision Models)">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </label>
+            <label for="fileInput" class="bg-dark-500 hover:bg-dark-400 text-gray-300 p-2.5 rounded-lg cursor-pointer transition" title="Upload Files">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
               </svg>
             </label>
-            <button id="webSearchBtn" class="bg-dark-500 hover:bg-dark-400 text-gray-300 p-2 rounded-lg transition" title="Toggle Tavily Web Search">
+            <button id="webSearchBtn" class="bg-dark-500 hover:bg-dark-400 text-gray-300 p-2.5 rounded-lg transition" title="Toggle Tavily Web Search">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </button>
           </div>
         </div>
+        <input type="file" id="imageInput" class="hidden" multiple accept="image/*">
         <input type="file" id="fileInput" class="hidden" multiple>
         <div id="attachedFiles" class="mt-3 flex flex-wrap gap-3 hidden"></div>
+        
+        <!-- Model Selection -->
+        <div class="mt-3 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="text-gray-400">Model:</span>
+            <select id="modelSelect" class="bg-dark-600 text-gray-300 border border-dark-500 rounded px-2 py-1 text-xs">
+              <option value="deepseek-v3-0324">DeepSeek-V3-0324 (Text)</option>
+              <option value="phi3-vision">Phi-3 Vision 128K (Vision)</option>
+              <option value="firellava">FireLLaVA 13B (Vision)</option>
+              <option value="deepseek-vision">DeepSeek V3 + Vision (Inline)</option>
+            </select>
+          </div>
+          <div id="visionIndicator" class="hidden flex items-center gap-1 text-purple-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+            <span>Vision Enabled</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -460,8 +577,15 @@
      * Global Configuration
      ***********************/
     const DEEPSEEK_MODEL = "accounts/fireworks/models/deepseek-v3-0324";
+    const VISION_MODELS = {
+      phi3_vision: "accounts/fireworks/models/phi-3-vision-128k-instruct",
+      firellava: "accounts/fireworks/models/firellava-13b",
+      deepseek_vision: "accounts/fireworks/models/deepseek-v3-0324" // With document inlining
+    };
 
     let REASONING_METHOD = "multi_stage_cod";
+    let CURRENT_MODEL = DEEPSEEK_MODEL;
+    let VISION_ENABLED = false;
     let TEMPERATURE = 0.3; // Optimized for DeepSeek-V3-0324
     let TOP_P = 0.9;
     let TOP_K = 40;
@@ -678,6 +802,247 @@ Format:
     }
     
     let attachedFiles = [];
+    let attachedImages = [];
+    
+    function handleImageInput() {
+      const imageInput = document.getElementById('imageInput');
+      const imagePreviewArea = document.getElementById('imagePreviewArea');
+      const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+      
+      if (!imageInput || !imagePreviewArea || !imagePreviewContainer) return;
+      
+      imageInput.addEventListener('change', (event) => {
+        try {
+          const files = event.target.files;
+          const maxFileSize = 10 * 1024 * 1024; // 10MB
+          const maxImages = 30; // Fireworks AI limit
+          
+          if (attachedImages.length + files.length > maxImages) {
+            showNotification(`Maximum ${maxImages} images allowed per request`);
+            return;
+          }
+          
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            
+            if (!file.type.startsWith('image/')) {
+              showNotification(`${file.name} is not an image file`);
+              continue;
+            }
+            
+            if (file.size > maxFileSize) {
+              showNotification(`Image ${file.name} is too large (max 10MB)`);
+              continue;
+            }
+            
+            if (attachedImages.some(img => img.name === file.name && img.size === file.size)) {
+              showNotification(`Image ${file.name} already attached`);
+              continue;
+            }
+            
+            attachedImages.push(file);
+            createImagePreview(file, imagePreviewContainer);
+          }
+          
+          if (attachedImages.length > 0) {
+            imagePreviewArea.classList.remove('hidden');
+            updateVisionIndicator();
+          }
+          
+          imageInput.value = '';
+        } catch (error) {
+          console.error('Error handling image upload:', error);
+          showNotification('Error uploading images.');
+        }
+      });
+    }
+    
+    function createImagePreview(file, container) {
+      const imagePreview = document.createElement('div');
+      imagePreview.className = 'relative bg-dark-700 rounded-lg border border-dark-600 overflow-hidden';
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement('img');
+        img.className = 'w-16 h-16 object-cover';
+        img.src = e.target.result;
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center';
+        
+        const removeButton = document.createElement('button');
+        removeButton.className = 'bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition';
+        removeButton.innerHTML = '×';
+        removeButton.addEventListener('click', () => {
+          attachedImages = attachedImages.filter(f => f !== file);
+          imagePreview.remove();
+          if (attachedImages.length === 0) {
+            document.getElementById('imagePreviewArea').classList.add('hidden');
+            updateVisionIndicator();
+          }
+        });
+        
+        overlay.appendChild(removeButton);
+        imagePreview.appendChild(img);
+        imagePreview.appendChild(overlay);
+        
+        const fileName = document.createElement('div');
+        fileName.className = 'absolute bottom-0 left-0 right-0 bg-black/75 text-white text-xs p-1 truncate';
+        fileName.textContent = file.name.length > 12 ? file.name.substring(0, 9) + '...' : file.name;
+        imagePreview.appendChild(fileName);
+      };
+      
+      reader.readAsDataURL(file);
+      container.appendChild(imagePreview);
+    }
+    
+    function updateVisionIndicator() {
+      const visionIndicator = document.getElementById('visionIndicator');
+      const modelSelect = document.getElementById('modelSelect');
+      
+      if (attachedImages.length > 0 && VISION_ENABLED) {
+        visionIndicator.classList.remove('hidden');
+      } else {
+        visionIndicator.classList.add('hidden');
+      }
+    }
+    
+    function updateModelSelection() {
+      const modelSelect = document.getElementById('modelSelect');
+      if (!modelSelect) return;
+      
+      modelSelect.addEventListener('change', (event) => {
+        const selectedModel = event.target.value;
+        
+        switch (selectedModel) {
+          case 'deepseek-v3-0324':
+            CURRENT_MODEL = DEEPSEEK_MODEL;
+            VISION_ENABLED = false;
+            break;
+          case 'phi3-vision':
+            CURRENT_MODEL = VISION_MODELS.phi3_vision;
+            VISION_ENABLED = true;
+            break;
+          case 'firellava':
+            CURRENT_MODEL = VISION_MODELS.firellava;
+            VISION_ENABLED = true;
+            break;
+          case 'deepseek-vision':
+            CURRENT_MODEL = VISION_MODELS.deepseek_vision;
+            VISION_ENABLED = true;
+            break;
+        }
+        
+        updateVisionIndicator();
+        updatePlaceholder();
+        showNotification(`Switched to ${event.target.options[event.target.selectedIndex].text}`);
+      });
+    }
+    
+    function updatePlaceholder() {
+      const textarea = document.getElementById('userInput');
+      if (textarea) {
+        if (VISION_ENABLED) {
+          textarea.placeholder = "Ask a complex problem for multi-stage CoD reasoning... (with images if vision enabled)";
+        } else {
+          textarea.placeholder = "Ask a complex problem for multi-stage CoD reasoning...";
+        }
+      }
+    }
+    
+    async function convertImageToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+    
+    function downloadCurrentThreadAsPdf() {
+      const thread = threads.find(t => t.id === currentThreadId);
+      if (!thread) {
+        showNotification("Error: No active thread found");
+        return;
+      }
+      
+      // Create a simplified PDF export using print functionality
+      // In a production environment, you'd use a proper PDF library like jsPDF
+      const content = generatePdfContent(thread);
+      
+      // Create a new window with the content for printing
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>CoD Studio Export - ${thread.name}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+            .header { border-bottom: 2px solid #5686f5; padding-bottom: 10px; margin-bottom: 20px; }
+            .message { margin-bottom: 20px; padding: 15px; border-radius: 8px; }
+            .user-message { background-color: #e3f2fd; border-left: 4px solid #2196f3; }
+            .bot-message { background-color: #f5f5f5; border-left: 4px solid #5686f5; }
+            .stage-info { background-color: #fff3e0; padding: 8px; margin: 10px 0; border-radius: 4px; font-size: 12px; }
+            .stats { font-size: 11px; color: #666; margin-top: 10px; }
+            pre { background-color: #f8f8f8; padding: 10px; border-radius: 4px; overflow-x: auto; }
+            @media print { body { margin: 0; } }
+          </style>
+        </head>
+        <body>
+          ${content}
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      
+      // Auto-print and close
+      printWindow.onload = () => {
+        printWindow.print();
+        setTimeout(() => printWindow.close(), 1000);
+      };
+      
+      showNotification("PDF export opened in new window");
+    }
+    
+    function generatePdfContent(thread) {
+      let content = `
+        <div class="header">
+          <h1>Advanced Chain of Draft Studio</h1>
+          <h2>${thread.name}</h2>
+          <p>Model: ${CURRENT_MODEL}</p>
+          <p>Method: ${REASONING_METHOD.toUpperCase()}</p>
+          <p>Export Date: ${new Date().toLocaleString()}</p>
+        </div>
+      `;
+      
+      thread.messages.forEach((msg, index) => {
+        if (msg.isPlaceholder) return;
+        
+        const className = msg.sender === 'user' ? 'user-message' : 'bot-message';
+        const prefix = msg.sender.toUpperCase();
+        
+        content += `
+          <div class="message ${className}">
+            <h3>${prefix}:</h3>
+            <div>${msg.content.replace(/\n/g, '<br>')}</div>
+            
+            ${msg.stageInfo ? `<div class="stage-info">${msg.stageInfo}</div>` : ''}
+            
+            <div class="stats">
+              ${msg.wordCount ? `Words: ${msg.wordCount} | ` : ''}
+              ${msg.totalTokens ? `Tokens: ${msg.totalTokens} | ` : ''}
+              ${msg.durationSeconds ? `Time: ${msg.durationSeconds}s` : ''}
+            </div>
+          </div>
+        `;
+      });
+      
+      return content;
+    }
     
     function handleFileInput() {
       const fileInput = document.getElementById('fileInput');
@@ -1079,6 +1444,48 @@ Format:
       return messages;
     }
     
+    async function buildMessagesWithImages(messages, images = []) {
+      if (!VISION_ENABLED || images.length === 0) {
+        return messages;
+      }
+      
+      // For vision models, we need to modify the last user message to include images
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage && lastMessage.role === 'user') {
+        const content = [];
+        
+        // Add images first (recommended for some models)
+        for (const image of images) {
+          try {
+            const base64 = await convertImageToBase64(image);
+            content.push({
+              type: "image_url",
+              image_url: {
+                url: `data:${image.type};base64,${base64}`
+              }
+            });
+          } catch (error) {
+            console.error('Error converting image to base64:', error);
+            showNotification(`Error processing image: ${image.name}`);
+          }
+        }
+        
+        // Add text content
+        content.push({
+          type: "text",
+          text: lastMessage.content
+        });
+        
+        // Replace the last message with the multimodal content
+        messages[messages.length - 1] = {
+          ...lastMessage,
+          content: content
+        };
+      }
+      
+      return messages;
+    }
+    
     async function sendMessage(message) {
       if (REASONING_METHOD === "standard") {
         return await sendStandardMessage(message);
@@ -1088,8 +1495,19 @@ Format:
     }
     
     async function sendStandardMessage(message) {
-      addMessageToCurrentThread(message, "user", false, attachedFiles.map(f => ({name: f.name, type: f.type, size: f.size})));
+      addMessageToCurrentThread(
+        message, 
+        "user", 
+        false, 
+        attachedFiles.map(f => ({name: f.name, type: f.type, size: f.size})),
+        null,
+        null,
+        attachedImages.map(img => ({name: img.name, type: img.type, size: img.size}))
+      );
+      
+      const imagesToSend = [...attachedImages];
       attachedFiles = [];
+      attachedImages = [];
       clearAttachedFiles();
       
       addMessageToCurrentThread("Thinking...", "bot", true);
@@ -1099,9 +1517,12 @@ Format:
       const startTime = performance.now();
       
       try {
-        const messages = [
-          { role: "user", content: message }
-        ];
+        let messages = [{ role: "user", content: message }];
+        
+        // Add images if vision model is enabled
+        if (VISION_ENABLED && imagesToSend.length > 0) {
+          messages = await buildMessagesWithImages(messages, imagesToSend);
+        }
         
         const response = await callFireworksAPI(messages);
         const endTime = performance.now();
@@ -1126,8 +1547,19 @@ Format:
     }
     
     async function sendMultiStageCoDMessage(message) {
-      addMessageToCurrentThread(message, "user", false, attachedFiles.map(f => ({name: f.name, type: f.type, size: f.size})));
+      addMessageToCurrentThread(
+        message, 
+        "user", 
+        false, 
+        attachedFiles.map(f => ({name: f.name, type: f.type, size: f.size})),
+        null,
+        null,
+        attachedImages.map(img => ({name: img.name, type: img.type, size: img.size}))
+      );
+      
+      const imagesToSend = [...attachedImages];
       attachedFiles = [];
+      attachedImages = [];
       clearAttachedFiles();
       
       const thread = threads.find(t => t.id === currentThreadId);
@@ -1136,12 +1568,18 @@ Format:
       showProgress(true, 0);
       
       try {
-        // Stage 1: Problem Analysis
+        // Stage 1: Problem Analysis (with images if available)
         addMessageToCurrentThread("🔍 Analyzing problem complexity and decomposition...", "bot", true);
         showProgress(true, 20);
         
         let placeholderIndex = thread.messages.length - 1;
-        const analysisMessages = buildMessagesForStage('analysis', message);
+        let analysisMessages = buildMessagesForStage('analysis', message);
+        
+        // Add images to analysis stage if vision enabled
+        if (VISION_ENABLED && imagesToSend.length > 0) {
+          analysisMessages = await buildMessagesWithImages(analysisMessages, imagesToSend);
+        }
+        
         const analysisResult = await callFireworksAPI(analysisMessages);
         
         thread.messages[placeholderIndex] = {
@@ -1163,7 +1601,7 @@ Format:
         
         showProgress(true, 40);
         
-        // Stages 2-N: CoD for each part
+        // Stages 2-N: CoD for each part (text-only for subsequent stages)
         for (let i = 0; i < numParts; i++) {
           addMessageToCurrentThread(`⚡ Working on Part ${i + 1} using Chain of Draft (5-word steps)...`, "bot", true);
           
@@ -1240,7 +1678,7 @@ Format:
     
     async function callFireworksAPI(messages) {
       const payload = {
-        model: DEEPSEEK_MODEL,
+        model: CURRENT_MODEL,
         messages: messages,
         temperature: TEMPERATURE,
         top_p: TOP_P,
@@ -1578,6 +2016,7 @@ Format:
       addListener("newThreadBtn", "click", createNewThread); 
       addListener("deleteThreadBtn", "click", deleteCurrentThread); 
       addListener("downloadTxtBtn", "click", downloadCurrentThreadAsTxt);
+      addListener("downloadPdfBtn", "click", downloadCurrentThreadAsPdf);
       
       addListener("clearThreadBtn", "click", () => { 
         if (confirm("Clear messages?")) { 
@@ -1611,7 +2050,7 @@ Format:
         const textarea = document.getElementById('userInput'); 
         if (textarea) { 
           const message = textarea.value.trim(); 
-          if (message || attachedFiles.length > 0) { 
+          if (message || attachedFiles.length > 0 || attachedImages.length > 0) { 
             sendMessage(message); 
             textarea.value = ''; 
             textarea.style.height = 'auto'; 
@@ -1620,6 +2059,8 @@ Format:
       });
       
       handleFileInput();
+      handleImageInput();
+      updateModelSelection();
       
       window.addEventListener("click", (event) => { 
         const settingsModal = document.getElementById("settingsModal"); 
