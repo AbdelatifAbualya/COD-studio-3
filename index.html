@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Advanced Chain of Draft Studio (DeepSeek-V3-0324)</title>
+  <title>Advanced Chain of Draft Studio - Enhanced with Memory & MCP</title>
   
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -185,7 +186,7 @@
           </div>
           <div>
             <h2 class="text-lg font-bold text-white">CoD Studio</h2>
-            <p class="text-xs text-gray-400">Chain of Draft AI</p>
+            <p class="text-xs text-gray-400">Enhanced AI Research</p>
           </div>
         </div>
         
@@ -196,6 +197,22 @@
           </svg>
           <span class="font-medium">New Session</span>
         </button>
+      </div>
+
+      <!-- Memory Status -->
+      <div class="p-4 border-b border-dark-600/50">
+        <div class="bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-500/30 rounded-lg p-3">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="text-green-300 text-sm font-medium">Memory Active</span>
+            </div>
+            <span id="memoryCount" class="text-green-400 text-xs bg-green-900/30 px-2 py-1 rounded-full">0 items</span>
+          </div>
+          <div class="text-green-200 text-xs">Storing conversations & preferences</div>
+        </div>
       </div>
 
       <!-- Threads Section -->
@@ -313,10 +330,11 @@
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Header -->
       <header class="bg-dark-700 border-b border-dark-600 h-16 flex items-center justify-between px-4 md:px-6">
-        <h1 id="pageTitle" class="text-xl font-semibold">Advanced Chain of Draft Studio (DeepSeek-V3-0324)</h1>
+        <h1 id="pageTitle" class="text-xl font-semibold">Enhanced CoD Studio - Memory & MCP</h1>
         <div class="flex items-center gap-3">
-          <div id="currentModelDisplay" class="bg-dark-600 text-sm px-3 py-1.5 rounded-lg flex items-center">
-            <span>DeepSeek-V3-0324 (Fireworks AI)</span>
+          <div id="currentModelDisplay" class="bg-dark-600 text-sm px-3 py-1.5 rounded-lg flex items-center gap-2">
+            <span id="modelDisplayText">Custom Model</span>
+            <span id="adaptiveIndicator" class="hidden">🧠</span>
           </div>
           <button id="openSettings" class="flex items-center gap-1.5 bg-dark-600 hover:bg-dark-500 text-gray-300 px-3 py-1.5 rounded-lg transition">
             <span>Settings</span>
@@ -351,7 +369,7 @@
 
         <div class="flex items-start gap-3 rounded-xl bg-dark-600 p-3 shadow-lg border border-dark-500 focus-within:border-primary-500 transition">
           <div class="flex-1">
-            <textarea id="userInput" rows="1" class="w-full bg-dark-700 text-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none text-base" placeholder="Ask a complex problem for multi-stage CoD reasoning... (with images if vision enabled)"></textarea>
+            <textarea id="userInput" rows="1" class="w-full bg-dark-700 text-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none text-base" placeholder="Ask a complex problem for adaptive CoD reasoning with memory..."></textarea>
           </div>
           <div class="flex flex-col gap-2 mt-1">
             <button id="sendBtn" class="bg-primary-500 hover:bg-primary-600 text-white p-3 rounded-lg transition">
@@ -369,36 +387,11 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
               </svg>
             </label>
-            <button id="webSearchBtn" class="bg-dark-500 hover:bg-dark-400 text-gray-300 p-2.5 rounded-lg transition" title="Toggle Tavily Web Search">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-            </button>
           </div>
         </div>
         <input type="file" id="imageInput" class="hidden" multiple accept="image/*">
         <input type="file" id="fileInput" class="hidden" multiple>
         <div id="attachedFiles" class="mt-3 flex flex-wrap gap-3 hidden"></div>
-        
-        <!-- Model Selection -->
-        <div class="mt-3 flex items-center justify-between text-xs">
-          <div class="flex items-center gap-2">
-            <span class="text-gray-400">Model:</span>
-            <select id="modelSelect" class="bg-dark-600 text-gray-300 border border-dark-500 rounded px-2 py-1 text-xs">
-              <option value="deepseek-v3-0324">DeepSeek-V3-0324 (Text)</option>
-              <option value="phi3-vision">Phi-3 Vision 128K (Vision)</option>
-              <option value="firellava">FireLLaVA 13B (Vision)</option>
-              <option value="deepseek-vision">DeepSeek V3 + Vision (Inline)</option>
-            </select>
-          </div>
-          <div id="visionIndicator" class="hidden flex items-center gap-1 text-purple-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-            </svg>
-            <span>Vision Enabled</span>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -408,9 +401,9 @@
 
   <!-- Settings Modal -->
   <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-    <div class="bg-dark-700 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="bg-dark-700 rounded-xl shadow-2xl max-w-5xl w-full mx-4 max-h-[90vh] overflow-y-auto">
       <div class="p-5 border-b border-dark-600 flex justify-between items-center">
-        <h2 class="text-xl font-semibold">Settings</h2>
+        <h2 class="text-xl font-semibold">Enhanced AI Configuration</h2>
         <button id="closeModalX" class="text-gray-400 hover:text-white">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -420,17 +413,98 @@
       
       <div class="p-5">
         <!-- Tab Navigation -->
-        <div class="bg-dark-600 rounded-lg p-1 flex mb-5">
-          <button class="tab-btn flex-1 py-2 px-4 rounded-md text-white bg-primary-500" data-tab="codTab">Advanced CoD</button>
-          <button class="tab-btn flex-1 py-2 px-4 rounded-md text-gray-400 transition" data-tab="parametersTab">Parameters</button>
-          <button class="tab-btn flex-1 py-2 px-4 rounded-md text-gray-400 transition" data-tab="toolsTab">Tools</button>
+        <div class="bg-dark-600 rounded-lg p-1 flex mb-5 overflow-x-auto">
+          <button class="tab-btn flex-shrink-0 py-2 px-4 rounded-md text-white bg-primary-500" data-tab="modelTab">🤖 Models</button>
+          <button class="tab-btn flex-shrink-0 py-2 px-4 rounded-md text-gray-400 transition" data-tab="codTab">🧠 CoD Settings</button>
+          <button class="tab-btn flex-shrink-0 py-2 px-4 rounded-md text-gray-400 transition" data-tab="parametersTab">⚙️ Parameters</button>
+          <button class="tab-btn flex-shrink-0 py-2 px-4 rounded-md text-gray-400 transition" data-tab="memoryTab">💾 Memory Control</button>
+          <button class="tab-btn flex-shrink-0 py-2 px-4 rounded-md text-gray-400 transition" data-tab="mcpTab">🔗 MCP Tools</button>
         </div>
         
-        <!-- Advanced CoD Tab Content -->
-        <div id="codTab" class="tab-content">
-          <h3 class="text-lg font-medium mb-4 pb-2 border-b border-dark-600">Advanced Chain of Draft Configuration</h3>
+        <!-- Model Selection Tab -->
+        <div id="modelTab" class="tab-content">
+          <h3 class="text-lg font-medium mb-4 pb-2 border-b border-dark-600">Model Configuration</h3>
           
+          <!-- Predefined Models -->
+          <div class="mb-6">
+            <h4 class="text-sm font-medium text-gray-300 mb-3">Popular Fireworks Models</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <label class="flex items-center p-3 bg-dark-600 rounded-lg border border-dark-500 cursor-pointer hover:border-primary-500 transition">
+                <input type="radio" name="modelType" value="preset" data-model="accounts/fireworks/models/deepseek-v3-0324" class="sr-only peer">
+                <div class="peer-checked:bg-primary-500 w-4 h-4 rounded-full border-2 border-gray-400 peer-checked:border-primary-500 mr-3 flex-shrink-0"></div>
+                <div>
+                  <div class="font-medium text-white">DeepSeek V3</div>
+                  <div class="text-xs text-gray-400">Latest reasoning model</div>
+                </div>
+              </label>
+              
+              <label class="flex items-center p-3 bg-dark-600 rounded-lg border border-dark-500 cursor-pointer hover:border-primary-500 transition">
+                <input type="radio" name="modelType" value="preset" data-model="accounts/fireworks/models/llama-v3p1-405b-instruct" class="sr-only peer">
+                <div class="peer-checked:bg-primary-500 w-4 h-4 rounded-full border-2 border-gray-400 peer-checked:border-primary-500 mr-3 flex-shrink-0"></div>
+                <div>
+                  <div class="font-medium text-white">Llama 3.1 405B</div>
+                  <div class="text-xs text-gray-400">Meta's flagship model</div>
+                </div>
+              </label>
+              
+              <label class="flex items-center p-3 bg-dark-600 rounded-lg border border-dark-500 cursor-pointer hover:border-primary-500 transition">
+                <input type="radio" name="modelType" value="preset" data-model="accounts/fireworks/models/phi-3-vision-128k-instruct" class="sr-only peer">
+                <div class="peer-checked:bg-primary-500 w-4 h-4 rounded-full border-2 border-gray-400 peer-checked:border-primary-500 mr-3 flex-shrink-0"></div>
+                <div>
+                  <div class="font-medium text-white">Phi-3 Vision</div>
+                  <div class="text-xs text-gray-400">Vision + text model</div>
+                </div>
+              </label>
+              
+              <label class="flex items-center p-3 bg-dark-600 rounded-lg border border-dark-500 cursor-pointer hover:border-primary-500 transition">
+                <input type="radio" name="modelType" value="preset" data-model="accounts/fireworks/models/qwen2p5-72b-instruct" class="sr-only peer">
+                <div class="peer-checked:bg-primary-500 w-4 h-4 rounded-full border-2 border-gray-400 peer-checked:border-primary-500 mr-3 flex-shrink-0"></div>
+                <div>
+                  <div class="font-medium text-white">Qwen2.5 72B</div>
+                  <div class="text-xs text-gray-400">Alibaba's latest model</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Custom Model Input -->
+          <div class="mb-6">
+            <h4 class="text-sm font-medium text-gray-300 mb-3">Custom Model</h4>
+            <label class="flex items-start p-3 bg-dark-600 rounded-lg border border-dark-500 cursor-pointer hover:border-primary-500 transition">
+              <input type="radio" name="modelType" value="custom" class="sr-only peer">
+              <div class="peer-checked:bg-primary-500 w-4 h-4 rounded-full border-2 border-gray-400 peer-checked:border-primary-500 mr-3 flex-shrink-0 mt-0.5"></div>
+              <div class="flex-1">
+                <div class="font-medium text-white mb-2">Custom Fireworks Model</div>
+                <input type="text" id="customModelPath" placeholder="accounts/fireworks/models/your-model-name" 
+                       class="w-full bg-dark-700 text-gray-100 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <div class="text-xs text-gray-400 mt-2">
+                  Enter any model path from <a href="https://fireworks.ai/models" target="_blank" class="text-primary-400 hover:text-primary-300">Fireworks.ai Models</a>
+                </div>
+              </div>
+            </label>
+          </div>
+          
+          <!-- Vision Model Detection -->
+          <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+            <div class="flex items-center text-blue-300 text-sm font-medium mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Vision Model Detection
+            </div>
+            <div class="text-blue-100 text-xs">
+              Models containing "vision", "llava", "gpt-4", or "claude" in their name will automatically enable image upload capabilities.
+            </div>
+          </div>
+        </div>
+        
+        <!-- CoD Settings Tab -->
+        <div id="codTab" class="tab-content hidden">
+          <h3 class="text-lg font-medium mb-4 pb-2 border-b border-dark-600">Chain of Draft Configuration</h3>
+          
+          <!-- Reasoning Method Selection -->
           <div class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-5">
+            <h4 class="text-sm font-medium text-gray-300 mb-3">Reasoning Method</h4>
             <div class="space-y-3">
               <div class="flex items-start">
                 <input type="radio" id="standardReasoning" name="reasoningMethod" value="standard" class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 focus:ring-primary-500 focus:ring-offset-dark-700">
@@ -443,45 +517,90 @@
               <div class="flex items-start">
                 <input type="radio" id="multiStageCoD" name="reasoningMethod" value="multi_stage_cod" checked class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 focus:ring-primary-500 focus:ring-offset-dark-700">
                 <label for="multiStageCoD" class="ml-3 block text-sm font-medium text-white">
-                  Multi-Stage Chain of Draft (Research Paper Implementation)
-                  <div class="text-gray-400 text-xs mt-1">Exact implementation from "Chain of Draft: Thinking Faster by Writing Less" paper with 5-word steps and multi-stage API calls.</div>
+                  Multi-Stage Chain of Draft
+                  <div class="text-gray-400 text-xs mt-1">Implementation with 5-word steps and multi-stage processing for maximum efficiency.</div>
                 </label>
               </div>
             </div>
           </div>
           
-          <div id="multiStageOptions" class="mb-5">
-            <h4 class="text-sm font-medium text-gray-300 mb-2">Multi-Stage CoD Configuration:</h4>
-            <div class="bg-dark-600 border border-dark-500 rounded-lg p-3">
-                <p class="text-xs text-gray-400">
-                    Multi-Stage Chain of Draft implements the exact methodology from the research paper:
-                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
-                        <li><strong>Stage 1:</strong> Initial problem analysis without CoD to determine complexity and parts</li>
-                        <li><strong>Stage 2-N:</strong> Work on each part with 5-word maximum CoD steps, followed by detailed reflection</li>
-                        <li><strong>Final Stage:</strong> Synthesize all reflections and create comprehensive answer</li>
-                        <li>Each reasoning step limited to exactly 5 words (as per paper)</li>
-                        <li>Separate API calls for each stage to maintain context isolation</li>
-                    </ul>
-                </p>
+          <!-- CoD Word Limit Settings -->
+          <div id="codWordLimitSection" class="mb-5">
+            <h4 class="text-sm font-medium text-gray-300 mb-3">CoD Word Limits</h4>
+            <div class="bg-dark-600 border border-dark-500 rounded-lg p-4 space-y-3">
+              <div class="flex items-start">
+                <input type="radio" id="cod5Words" name="codWordLimit" value="5" checked class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400">
+                <label for="cod5Words" class="ml-3 block text-sm font-medium text-white">
+                  5 words per step
+                  <div class="text-gray-400 text-xs mt-1">Original paper recommendation - maximum efficiency (7.6% of CoT tokens)</div>
+                </label>
+              </div>
+              
+              <div class="flex items-start">
+                <input type="radio" id="cod10Words" name="codWordLimit" value="10" class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400">
+                <label for="cod10Words" class="ml-3 block text-sm font-medium text-white">
+                  10 words per step
+                  <div class="text-gray-400 text-xs mt-1">Balanced brevity and clarity - good for complex problems</div>
+                </label>
+              </div>
+              
+              <div class="flex items-start">
+                <input type="radio" id="cod15Words" name="codWordLimit" value="15" class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400">
+                <label for="cod15Words" class="ml-3 block text-sm font-medium text-white">
+                  15 words per step
+                  <div class="text-gray-400 text-xs mt-1">More descriptive steps for mathematical and scientific reasoning</div>
+                </label>
+              </div>
+              
+              <div class="flex items-start">
+                <input type="radio" id="cod20Words" name="codWordLimit" value="20" class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400">
+                <label for="cod20Words" class="ml-3 block text-sm font-medium text-white">
+                  20 words per step
+                  <div class="text-gray-400 text-xs mt-1">Detailed steps for complex logical and analytical tasks</div>
+                </label>
+              </div>
             </div>
           </div>
           
-          <div class="bg-dark-700 rounded-lg p-4 mb-5">
-            <div class="flex items-center text-blue-300 text-sm font-medium mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              Research Paper Implementation Details
+          <!-- Adaptive Reasoning Section -->
+          <div class="bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/30 rounded-lg p-4 mb-5">
+            <h4 class="text-sm font-medium text-purple-300 mb-3 flex items-center gap-2">
+              <span>🧠</span>
+              Adaptive Reasoning Enhancement
+              <span class="bg-purple-600/20 text-purple-300 text-xs px-2 py-1 rounded-full">AI-POWERED</span>
+            </h4>
+            
+            <div class="space-y-3">
+              <div class="flex items-start">
+                <input type="radio" id="adaptiveComplexity" name="reasoningEnhancement" value="adaptive" class="w-4 h-4 mt-1 text-purple-500 bg-dark-500 border-dark-400">
+                <label for="adaptiveComplexity" class="ml-3 block text-sm font-medium text-white">
+                  Adaptive Complexity Detection
+                  <div class="text-purple-200 text-xs mt-1">Automatically adjusts reasoning depth and word limits based on problem complexity analysis</div>
+                </label>
+              </div>
+              
+              <div class="flex items-start">
+                <input type="radio" id="fixedReasoning" name="reasoningEnhancement" value="fixed" checked class="w-4 h-4 mt-1 text-purple-500 bg-dark-500 border-dark-400">
+                <label for="fixedReasoning" class="ml-3 block text-sm font-medium text-white">
+                  Fixed Reasoning Depth
+                  <div class="text-purple-200 text-xs mt-1">Uses consistent reasoning approach and word limits for all problems</div>
+                </label>
+              </div>
             </div>
-            <div class="text-gray-400 text-xs">
-              <p>This implementation follows the exact Chain of Draft methodology from the research paper:</p>
-              <ul class="list-disc list-inside mt-2 space-y-1">
-                <li>5-word maximum per reasoning step (enforced strictly)</li>
-                <li>Token efficiency: Uses as little as 7.6% of traditional CoT tokens</li>
-                <li>Multi-stage processing with context isolation</li>
-                <li>Progressive problem decomposition and synthesis</li>
-                <li>Detailed reflections after each problem component</li>
-              </ul>
+            
+            <div class="mt-4 p-3 bg-dark-700/50 rounded-lg">
+              <div class="text-xs text-purple-100">
+                <strong>Adaptive Detection analyzes:</strong>
+                <ul class="list-disc list-inside mt-1 space-y-0.5 text-purple-200">
+                  <li>Mathematical content (equations, calculations)</li>
+                  <li>Logical keywords (analyze, compare, evaluate)</li>
+                  <li>Multi-step indicators (first, then, process)</li>
+                  <li>Research terms (study, investigate, comprehensive)</li>
+                  <li>Coding content (algorithm, debug, implement)</li>
+                  <li>Scientific language (hypothesis, experiment, data)</li>
+                  <li>Message length and question complexity</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -512,7 +631,7 @@
               <span id="tempValue" class="text-sm text-gray-400">0.3</span>
             </div>
             <input type="range" id="temp" min="0" max="2" step="0.01" value="0.3" class="w-full h-2 rounded-lg appearance-none cursor-pointer">
-            <p class="text-xs text-gray-500 mt-1">DeepSeek-V3-0324 optimized: 0.3 (API temp 1.0 = model temp 0.3)</p>
+            <p class="text-xs text-gray-500 mt-1">Controls randomness. Lower = more focused, Higher = more creative</p>
           </div>
           
           <div class="mb-4">
@@ -539,23 +658,346 @@
               <span id="maxTokensValue" class="text-sm text-gray-400">8192</span>
             </div>
             <input type="range" id="maxTokens" min="1" max="16384" step="128" value="8192" class="w-full h-2 rounded-lg appearance-none cursor-pointer">
-            <p class="text-xs text-gray-500 mt-1">Maximum length of the response. (DeepSeek-V3-0324 context: 128K tokens)</p>
+            <p class="text-xs text-gray-500 mt-1">Maximum length of the response.</p>
           </div>
         </div>
         
-        <!-- Tools Tab Content -->
-        <div id="toolsTab" class="tab-content hidden">
-          <h3 class="text-lg font-medium mb-4 pb-2 border-b border-dark-600">Available Tools</h3>
+        <!-- Memory Control Tab -->
+        <div id="memoryTab" class="tab-content hidden">
+          <h3 class="text-lg font-medium mb-4 pb-2 border-b border-dark-600">Memory Control System</h3>
           
-          <div class="space-y-4">
-            <div class="bg-dark-600 border border-dark-500 rounded-lg p-4">
-              <div class="flex items-start">
-                <input type="checkbox" id="tavilySearchTool" name="tools" value="tavily_search" class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 focus:ring-primary-500 focus:ring-offset-dark-700">
-                <label for="tavilySearchTool" class="ml-3 block text-sm font-medium text-white">
-                  Enable Tavily Web Search
-                  <div class="text-gray-400 text-xs mt-1">Allows the model to search the web for up-to-date information during CoD stages.</div>
-                </label>
+          <div class="bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-500/30 rounded-lg p-4 mb-6">
+            <div class="flex items-center text-green-300 text-sm font-medium mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Memory System Status
+              <span class="bg-green-600/20 text-green-300 text-xs px-2 py-1 rounded-full ml-2">VERCEL KV</span>
+            </div>
+            <div class="text-green-100 text-xs">
+              Powered by Vercel KV (Redis) for persistent, high-performance memory storage. Stores conversations, preferences, and context across sessions.
+            </div>
+          </div>
+          
+          <!-- Information Categories -->
+          <div class="mb-6">
+            <h4 class="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              Information Categories to Save
+            </h4>
+            
+            <div class="space-y-3">
+              <label class="flex items-start p-3 bg-dark-600 rounded-lg border border-dark-500 cursor-pointer hover:border-primary-500/50 transition">
+                <input type="checkbox" id="savePersonalInfo" checked class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 rounded focus:ring-primary-500">
+                <div class="ml-3">
+                  <div class="font-medium text-white">Personal Information (name, preferences, background)</div>
+                  <div class="text-gray-400 text-xs mt-1">Store user preferences, communication style, and personal context</div>
+                </div>
+              </label>
+              
+              <label class="flex items-start p-3 bg-dark-600 rounded-lg border border-dark-500 cursor-pointer hover:border-primary-500/50 transition">
+                <input type="checkbox" id="saveProjectDetails" checked class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 rounded focus:ring-primary-500">
+                <div class="ml-3">
+                  <div class="font-medium text-white">Project Details & Work Context</div>
+                  <div class="text-gray-400 text-xs mt-1">Remember ongoing projects, deadlines, and work-related information</div>
+                </div>
+              </label>
+              
+              <label class="flex items-start p-3 bg-dark-600 rounded-lg border border-dark-500 cursor-pointer hover:border-primary-500/50 transition">
+                <input type="checkbox" id="saveTechnicalKnowledge" checked class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 rounded focus:ring-primary-500">
+                <div class="ml-3">
+                  <div class="font-medium text-white">Technical Knowledge & Code Preferences</div>
+                  <div class="text-gray-400 text-xs mt-1">Store coding preferences, technical decisions, and development patterns</div>
+                </div>
+              </label>
+              
+              <label class="flex items-start p-3 bg-dark-600 rounded-lg border border-dark-500 cursor-pointer hover:border-primary-500/50 transition">
+                <input type="checkbox" id="saveConversationHistory" class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 rounded focus:ring-primary-500">
+                <div class="ml-3">
+                  <div class="font-medium text-white">Full Conversation History</div>
+                  <div class="text-gray-400 text-xs mt-1">Save complete conversation logs for future reference</div>
+                </div>
+              </label>
+              
+              <label class="flex items-start p-3 bg-dark-600 rounded-lg border border-dark-500 cursor-pointer hover:border-primary-500/50 transition">
+                <input type="checkbox" id="saveFileOperations" class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 rounded focus:ring-primary-500">
+                <div class="ml-3">
+                  <div class="font-medium text-white">File Operations & Document References</div>
+                  <div class="text-gray-400 text-xs mt-1">Track file uploads, document references, and research materials</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Memory Retention -->
+          <div class="mb-6">
+            <h4 class="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Memory Retention
+            </h4>
+            
+            <div class="bg-dark-600 rounded-lg p-4">
+              <select id="memoryRetention" class="w-full bg-dark-700 text-gray-100 rounded-lg p-3 border border-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <option value="forever">Keep Forever</option>
+                <option value="1year">1 Year</option>
+                <option value="6months">6 Months</option>
+                <option value="3months">3 Months</option>
+                <option value="1month">1 Month</option>
+                <option value="1week">1 Week</option>
+              </select>
+              <div class="text-gray-400 text-xs mt-2">
+                How long to keep saved memories. Older memories will be automatically cleaned up.
               </div>
+            </div>
+          </div>
+          
+          <!-- Memory Actions -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button id="viewSavedMemories" class="bg-dark-600 hover:bg-dark-500 text-gray-300 hover:text-white py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 border border-dark-500 hover:border-gray-500">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+              <span>View Saved Memories</span>
+            </button>
+            
+            <button id="clearAllMemory" class="bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 border border-red-600/20 hover:border-red-500/50">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              <span>Clear All Memory</span>
+            </button>
+          </div>
+          
+          <!-- Memory Statistics -->
+          <div class="mt-6 bg-dark-600 rounded-lg p-4 border border-dark-500">
+            <h5 class="text-sm font-medium text-gray-300 mb-3">Memory Statistics</h5>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              <div class="bg-dark-700 rounded-lg p-3">
+                <div id="memoryPersonalCount" class="text-lg font-bold text-primary-400">0</div>
+                <div class="text-xs text-gray-400">Personal</div>
+              </div>
+              <div class="bg-dark-700 rounded-lg p-3">
+                <div id="memoryProjectCount" class="text-lg font-bold text-green-400">0</div>
+                <div class="text-xs text-gray-400">Projects</div>
+              </div>
+              <div class="bg-dark-700 rounded-lg p-3">
+                <div id="memoryTechnicalCount" class="text-lg font-bold text-blue-400">0</div>
+                <div class="text-xs text-gray-400">Technical</div>
+              </div>
+              <div class="bg-dark-700 rounded-lg p-3">
+                <div id="memoryTotalCount" class="text-lg font-bold text-purple-400">0</div>
+                <div class="text-xs text-gray-400">Total</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- MCP Tools Tab -->
+        <div id="mcpTab" class="tab-content hidden">
+          <h3 class="text-lg font-medium mb-4 pb-2 border-b border-dark-600">Model Context Protocol Integration</h3>
+          
+          <div class="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border border-blue-500/30 rounded-lg p-4 mb-6">
+            <div class="flex items-center text-blue-300 text-sm font-medium mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              MCP Integration Status
+              <span class="bg-blue-600/20 text-blue-300 text-xs px-2 py-1 rounded-full ml-2">LOCAL TOOLS</span>
+            </div>
+            <div class="text-blue-100 text-xs">
+              MCP (Model Context Protocol) enables your AI to access local tools and data sources through standardized connectors. Here's what each server provides:
+            </div>
+          </div>
+          
+          <!-- Available MCP Tools -->
+          <div class="mb-6">
+            <h4 class="text-sm font-medium text-gray-300 mb-4">Available MCP Tools</h4>
+            
+            <div class="space-y-3">
+              <!-- Filesystem -->
+              <div class="bg-dark-600 rounded-lg p-4 border border-dark-500">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between mb-2">
+                      <h5 class="font-medium text-white">📁 Filesystem</h5>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="mcpFilesystem" class="sr-only peer">
+                        <div class="w-11 h-6 bg-dark-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                      </label>
+                    </div>
+                    <div class="text-gray-400 text-sm">Read/write files on your computer, list directories, navigate file system</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Memory (Built-in) -->
+              <div class="bg-dark-600 rounded-lg p-4 border border-dark-500">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between mb-2">
+                      <h5 class="font-medium text-white">🧠 Memory</h5>
+                      <div class="bg-green-600/20 text-green-300 text-xs px-2 py-1 rounded-full">BUILT-IN</div>
+                    </div>
+                    <div class="text-gray-400 text-sm">Persistent memory across conversations, stores context and learnings (Vercel KV)</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Puppeteer -->
+              <div class="bg-dark-600 rounded-lg p-4 border border-dark-500">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between mb-2">
+                      <h5 class="font-medium text-white">🎭 Puppeteer</h5>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="mcpPuppeteer" class="sr-only peer">
+                        <div class="w-11 h-6 bg-dark-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    <div class="text-gray-400 text-sm">Browser automation, take screenshots, interact with web pages</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- SQLite -->
+              <div class="bg-dark-600 rounded-lg p-4 border border-dark-500">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between mb-2">
+                      <h5 class="font-medium text-white">🗃️ SQLite</h5>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="mcpSqlite" class="sr-only peer">
+                        <div class="w-11 h-6 bg-dark-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                      </label>
+                    </div>
+                    <div class="text-gray-400 text-sm">Query databases, analyze structured data, store research data</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Git -->
+              <div class="bg-dark-600 rounded-lg p-4 border border-dark-500">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between mb-2">
+                      <h5 class="font-medium text-white">📚 Git</h5>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="mcpGit" class="sr-only peer">
+                        <div class="w-11 h-6 bg-dark-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                      </label>
+                    </div>
+                    <div class="text-gray-400 text-sm">Access repositories, check history, analyze code changes</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Web Search -->
+              <div class="bg-dark-600 rounded-lg p-4 border border-dark-500">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between mb-2">
+                      <h5 class="font-medium text-white">🌐 Web Search</h5>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="mcpWebSearch" class="sr-only peer">
+                        <div class="w-11 h-6 bg-dark-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                      </label>
+                    </div>
+                    <div class="text-gray-400 text-sm">Search the internet for real-time information</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Web Fetch -->
+              <div class="bg-dark-600 rounded-lg p-4 border border-dark-500">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V9a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2z"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between mb-2">
+                      <h5 class="font-medium text-white">📄 Web Fetch</h5>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="mcpWebFetch" class="sr-only peer">
+                        <div class="w-11 h-6 bg-dark-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                      </label>
+                    </div>
+                    <div class="text-gray-400 text-sm">Extract content from web pages as markdown</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Custom MCP Server -->
+          <div class="mb-6">
+            <h4 class="text-sm font-medium text-gray-300 mb-3">Add Custom MCP Server</h4>
+            <div class="bg-dark-600 rounded-lg p-4 border border-dark-500">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <input type="text" id="mcpServerName" placeholder="Server Name" 
+                       class="bg-dark-700 text-gray-100 rounded-lg p-3 border border-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <input type="text" id="mcpServerCommand" placeholder="MCP server command (e.g., npx @modelcontextprotocol/server-filesystem /home/user/)" 
+                       class="bg-dark-700 text-gray-100 rounded-lg p-3 border border-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
+              </div>
+              <button id="addMcpServer" class="bg-primary-500 hover:bg-primary-600 text-white py-2 px-4 rounded-lg transition flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Add Server
+              </button>
+            </div>
+          </div>
+          
+          <!-- Deployment Information -->
+          <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+            <div class="flex items-center text-blue-300 text-sm font-medium mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Vercel Deployment Information
+            </div>
+            <div class="text-blue-100 text-xs space-y-1">
+              <p>• MCP servers can be deployed as Vercel Functions using the official template</p>
+              <p>• For SSE transport (required by Claude Desktop), integrate Redis through Vercel KV</p>
+              <p>• HTTP transport works directly with web-based MCP clients</p>
+              <p>• Check the <a href="https://vercel.com/docs/mcp" target="_blank" class="text-blue-400 hover:text-blue-300 underline">Vercel MCP Documentation</a> for deployment guides</p>
             </div>
           </div>
         </div>
@@ -574,26 +1016,277 @@
 
   <script>
     /***********************
-     * Global Configuration
+     * Enhanced Configuration
      ***********************/
-    const DEEPSEEK_MODEL = "accounts/fireworks/models/deepseek-v3-0324";
-    const VISION_MODELS = {
-      phi3_vision: "accounts/fireworks/models/phi-3-vision-128k-instruct",
-      firellava: "accounts/fireworks/models/firellava-13b",
-      deepseek_vision: "accounts/fireworks/models/deepseek-v3-0324" // With document inlining
+    const CONFIG = {
+      // Model Configuration
+      currentModel: "accounts/fireworks/models/deepseek-v3-0324",
+      isVisionModel: false,
+      
+      // Reasoning Configuration
+      reasoningMethod: "multi_stage_cod",
+      codWordLimit: 5,
+      reasoningEnhancement: "fixed", // "adaptive" or "fixed"
+      
+      // Generation Parameters
+      temperature: 0.3,
+      topP: 0.9,
+      topK: 40,
+      maxTokens: 8192,
+      enableStreaming: true,
+      
+      // Memory Configuration
+      memoryCategories: {
+        personalInfo: true,
+        projectDetails: true,
+        technicalKnowledge: true,
+        conversationHistory: false,
+        fileOperations: false
+      },
+      memoryRetention: "forever",
+      
+      // MCP Configuration
+      mcpServers: {
+        filesystem: false,
+        puppeteer: false,
+        sqlite: false,
+        git: false,
+        webSearch: false,
+        webFetch: false
+      }
     };
 
-    let REASONING_METHOD = "multi_stage_cod";
-    let CURRENT_MODEL = DEEPSEEK_MODEL;
-    let VISION_ENABLED = false;
-    let TEMPERATURE = 0.3; // Optimized for DeepSeek-V3-0324
-    let TOP_P = 0.9;
-    let TOP_K = 40;
-    let MAX_TOKENS = 8192;
-    let ENABLE_STREAMING = true;
-    let ENABLED_TOOLS = [];
-    let enableWebSearchQuickToggle = false; 
+    // Memory Storage (using localStorage as fallback for demo)
+    const MEMORY = {
+      personal: [],
+      projects: [],
+      technical: [],
+      conversations: [],
+      files: []
+    };
+
+    /*====================================
+     * ADAPTIVE COMPLEXITY DETECTION
+     ===================================*/
+    function analyzeProblemComplexity(message) {
+      const complexity = {
+        hasMath: /[\d\+\-\*\/\=\(\)\^\%]/.test(message),
+        hasLogic: /\b(if|then|else|because|therefore|since|implies|prove|logic|reasoning|analyze|compare|evaluate|assess)\b/i.test(message),
+        multiStep: /\b(first|next|then|after|finally|step|calculate|find|determine|process|stages?|phases?)\b/i.test(message),
+        isLong: message.length > 200,
+        hasResearch: /\b(research|study|investigate|explore|examine|review|analysis|synthesis|comprehensive)\b/i.test(message),
+        hasCoding: /\b(code|programming|algorithm|function|class|variable|debug|implement|develop)\b/i.test(message),
+        hasScientific: /\b(hypothesis|theory|experiment|data|statistical|scientific|methodology|empirical)\b/i.test(message),
+        wordCount: countWords(message),
+        questionWords: (message.match(/\b(what|how|why|when|where|which|who)\b/gi) || []).length
+      };
+
+      let score = 0;
+      if (complexity.hasMath) score += 2;
+      if (complexity.hasLogic) score += 1;
+      if (complexity.multiStep) score += 1;
+      if (complexity.isLong) score += 1;
+      if (complexity.hasResearch) score += 2;
+      if (complexity.hasCoding) score += 1;
+      if (complexity.hasScientific) score += 1;
+      if (complexity.questionWords > 2) score += 1;
+
+      // Determine complexity level
+      if (score >= 6) {
+        complexity.level = 'very_complex';
+      } else if (score >= 4) {
+        complexity.level = 'complex';
+      } else if (score >= 2) {
+        complexity.level = 'normal';
+      } else {
+        complexity.level = 'simple';
+      }
+
+      return complexity;
+    }
+
+    function getAdaptiveReasoningSettings(message) {
+      if (CONFIG.reasoningEnhancement !== 'adaptive') {
+        return {
+          method: CONFIG.reasoningMethod,
+          wordLimit: CONFIG.codWordLimit,
+          adapted: false
+        };
+      }
+
+      const complexity = analyzeProblemComplexity(message);
+      let adaptedMethod = CONFIG.reasoningMethod;
+      let adaptedWordLimit = CONFIG.codWordLimit;
+      let reasoning = '';
+
+      // Adaptive reasoning selection
+      if (complexity.level === 'simple' && CONFIG.reasoningMethod === 'multi_stage_cod') {
+        // For simple problems, even shorter CoD is fine
+        adaptedWordLimit = Math.max(5, CONFIG.codWordLimit - 5);
+        reasoning = 'Simple problem detected - using minimal CoD steps';
+      } else if (complexity.level === 'very_complex') {
+        if (CONFIG.reasoningMethod === 'multi_stage_cod') {
+          // For very complex problems, increase word limit
+          adaptedWordLimit = Math.min(20, CONFIG.codWordLimit + 10);
+          reasoning = 'Very complex problem detected - using extended CoD steps';
+        } else if (CONFIG.reasoningMethod === 'standard') {
+          // Auto-upgrade to CoD for very complex problems
+          adaptedMethod = 'multi_stage_cod';
+          reasoning = 'Very complex problem detected - auto-upgrading to Chain of Draft';
+        }
+      } else if (complexity.level === 'complex') {
+        if (CONFIG.reasoningMethod === 'multi_stage_cod') {
+          // Moderate increase for complex problems
+          adaptedWordLimit = Math.min(15, CONFIG.codWordLimit + 5);
+          reasoning = 'Complex problem detected - using moderate CoD expansion';
+        }
+      }
+
+      return {
+        method: adaptedMethod,
+        wordLimit: adaptedWordLimit,
+        complexity: complexity,
+        adapted: adaptedMethod !== CONFIG.reasoningMethod || adaptedWordLimit !== CONFIG.codWordLimit,
+        reasoning: reasoning
+      };
+    }
+
+    /***********************
+     * Memory System Functions
+     ***********************/
+    async function saveToMemory(category, data, context = '') {
+      try {
+        // In a real implementation, this would call your Vercel API endpoint
+        // For now, we'll simulate with localStorage
+        const memoryItem = {
+          id: Date.now(),
+          timestamp: new Date().toISOString(),
+          data: data,
+          context: context,
+          category: category
+        };
+        
+        if (!MEMORY[category]) MEMORY[category] = [];
+        MEMORY[category].push(memoryItem);
+        
+        // Save to localStorage (in production: save to Vercel KV)
+        localStorage.setItem('aiMemory', JSON.stringify(MEMORY));
+        
+        updateMemoryStats();
+        showNotification(`Saved to ${category} memory`);
+        
+        return memoryItem;
+      } catch (error) {
+        console.error('Error saving to memory:', error);
+        showNotification('Error saving to memory', 3000);
+      }
+    }
     
+    async function retrieveFromMemory(category, query = '') {
+      try {
+        // In a real implementation, this would call your Vercel API endpoint with semantic search
+        const categoryMemories = MEMORY[category] || [];
+        
+        if (!query) return categoryMemories;
+        
+        // Simple text matching (in production: use semantic search)
+        return categoryMemories.filter(item => 
+          item.data.toLowerCase().includes(query.toLowerCase()) ||
+          item.context.toLowerCase().includes(query.toLowerCase())
+        );
+      } catch (error) {
+        console.error('Error retrieving from memory:', error);
+        return [];
+      }
+    }
+    
+    async function clearMemory(category = null) {
+      try {
+        if (category) {
+          MEMORY[category] = [];
+        } else {
+          // Clear all memory
+          Object.keys(MEMORY).forEach(key => MEMORY[key] = []);
+        }
+        
+        localStorage.setItem('aiMemory', JSON.stringify(MEMORY));
+        updateMemoryStats();
+        showNotification(category ? `Cleared ${category} memory` : 'Cleared all memory');
+      } catch (error) {
+        console.error('Error clearing memory:', error);
+        showNotification('Error clearing memory');
+      }
+    }
+    
+    function loadMemoryFromStorage() {
+      try {
+        const saved = localStorage.getItem('aiMemory');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          Object.assign(MEMORY, parsed);
+        }
+        updateMemoryStats();
+      } catch (error) {
+        console.error('Error loading memory:', error);
+      }
+    }
+    
+    function updateMemoryStats() {
+      const personalCount = MEMORY.personal?.length || 0;
+      const projectCount = MEMORY.projects?.length || 0;
+      const technicalCount = MEMORY.technical?.length || 0;
+      const totalCount = personalCount + projectCount + technicalCount + 
+                        (MEMORY.conversations?.length || 0) + (MEMORY.files?.length || 0);
+      
+      // Update sidebar counter
+      const memoryCountEl = document.getElementById('memoryCount');
+      if (memoryCountEl) {
+        memoryCountEl.textContent = `${totalCount} items`;
+      }
+      
+      // Update statistics in settings
+      const elements = {
+        'memoryPersonalCount': personalCount,
+        'memoryProjectCount': projectCount,
+        'memoryTechnicalCount': technicalCount,
+        'memoryTotalCount': totalCount
+      };
+      
+      Object.entries(elements).forEach(([id, count]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = count;
+      });
+    }
+    
+    async function analyzeAndSaveMemory(message, response, context = '') {
+      if (!CONFIG.memoryCategories) return;
+      
+      try {
+        // Analyze message for different types of information
+        const personalPatterns = /\b(my name is|i am|i'm|i work at|i live in|i prefer|i like|i don't like)\b/i;
+        const projectPatterns = /\b(project|deadline|meeting|task|goal|working on)\b/i;
+        const technicalPatterns = /\b(code|programming|language|framework|library|API|database)\b/i;
+        
+        if (CONFIG.memoryCategories.personalInfo && personalPatterns.test(message)) {
+          await saveToMemory('personal', message, `User message: ${context}`);
+        }
+        
+        if (CONFIG.memoryCategories.projectDetails && projectPatterns.test(message)) {
+          await saveToMemory('projects', message, `Project context: ${context}`);
+        }
+        
+        if (CONFIG.memoryCategories.technicalKnowledge && technicalPatterns.test(message)) {
+          await saveToMemory('technical', message, `Technical discussion: ${context}`);
+        }
+        
+        if (CONFIG.memoryCategories.conversationHistory) {
+          await saveToMemory('conversations', `Q: ${message}\nA: ${response}`, context);
+        }
+      } catch (error) {
+        console.error('Error analyzing and saving memory:', error);
+      }
+    }
+
     /***********************
      * Multi-Stage CoD Prompts
      ***********************/
@@ -614,20 +1307,20 @@ Respond with:
 
 Do NOT solve the problem. Only analyze and decompose it.`,
 
-      // Stage 2-N: CoD with 5-word steps
-      cod_stage: `You are working on solving ONE SPECIFIC PART of a larger problem using Chain of Draft methodology.
+      // Stage 2-N: CoD with word limits
+      cod_stage: (wordLimit) => `You are working on solving ONE SPECIFIC PART of a larger problem using Chain of Draft methodology.
 
 CRITICAL RULES:
 - Use Chain of Draft (CoD) reasoning
-- Each reasoning step must be EXACTLY 5 words or less
+- Each reasoning step must be EXACTLY ${wordLimit} words or less
 - Focus ONLY on the assigned part
 - After CoD steps, provide a detailed reflection
 
 Format:
-CoD Step 1: [5 words max]
-CoD Step 2: [5 words max]
+CoD Step 1: [${wordLimit} words max]
+CoD Step 2: [${wordLimit} words max]
 ...
-CoD Step N: [5 words max]
+CoD Step N: [${wordLimit} words max]
 
 #### DETAILED REFLECTION
 [Comprehensive reflection on this part - no word limit. Analyze your reasoning, check for errors, discuss confidence level, and provide insights.]
@@ -663,7 +1356,7 @@ Format:
         id: Date.now(),
         name: `Thread ${threadCounter++}`,
         messages: [],
-        codStages: [] // Track multi-stage CoD progress
+        codStages: []
       };
       threads.push(newThread);
       currentThreadId = newThread.id;
@@ -716,6 +1409,12 @@ Format:
           mobileThreadList.appendChild(li);
         });
       }
+      
+      // Update thread count
+      const threadCountEl = document.getElementById("threadCount");
+      if (threadCountEl) {
+        threadCountEl.textContent = threads.length;
+      }
     }
     
     function deleteCurrentThread() {
@@ -741,9 +1440,14 @@ Format:
         return; 
       }
       
-      let content = `Advanced Chain of Draft Studio - ${REASONING_METHOD.toUpperCase()}\n`;
-      content += `Model: ${DEEPSEEK_MODEL}\n`;
-      content += `Multi-Stage CoD Implementation\n\n`;
+      let content = `Enhanced Chain of Draft Studio\n`;
+      content += `Model: ${CONFIG.currentModel}\n`;
+      content += `Reasoning: ${CONFIG.reasoningMethod.toUpperCase()}\n`;
+      content += `Word Limit: ${CONFIG.codWordLimit} words per step\n`;
+      content += `Adaptive: ${CONFIG.reasoningEnhancement === 'adaptive' ? 'Enabled' : 'Disabled'}\n`;
+      content += `Memory: ${Object.values(CONFIG.memoryCategories).some(v => v) ? 'Active' : 'Disabled'}\n`;
+      content += `Export Date: ${new Date().toLocaleString()}\n\n`;
+      content += `${'='.repeat(50)}\n\n`;
       
       thread.messages.forEach(msg => {
         if (msg.isPlaceholder) return;
@@ -751,14 +1455,20 @@ Format:
         content += `${prefix}:\n${msg.content}\n\n`;
         
         if (msg.sender === 'bot' && !msg.isPlaceholder && !msg.isStreaming) {
+          if (msg.stageInfo) {
+            content += `[${msg.stageInfo}]\n`;
+          }
+          if (msg.reasoning) {
+            content += `[Adaptive Reasoning: ${msg.reasoning}]\n`;
+          }
           if (msg.wordCount !== undefined) {
-            content += `(Words: ${msg.wordCount})\n`;
+            content += `[Words: ${msg.wordCount}]\n`;
           }
           if (msg.totalTokens !== undefined) {
-            content += `(Tokens: ${msg.totalTokens})\n`;
+            content += `[Tokens: ${msg.totalTokens}]\n`;
           }
           if (msg.durationSeconds !== undefined) {
-            content += `(Time: ${msg.durationSeconds}s)\n`;
+            content += `[Time: ${msg.durationSeconds}s]\n`;
           }
           content += "\n";
         }
@@ -768,7 +1478,7 @@ Format:
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${thread.name || "Thread"}_CoD.txt`;
+      a.download = `${thread.name || "Thread"}_Enhanced_CoD.txt`;
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
@@ -777,6 +1487,97 @@ Format:
         URL.revokeObjectURL(url); 
       }, 100);
       showNotification("TXT file downloaded");
+    }
+    
+    function downloadCurrentThreadAsPdf() {
+      const thread = threads.find(t => t.id === currentThreadId);
+      if (!thread) {
+        showNotification("Error: No active thread found");
+        return;
+      }
+      
+      // Create a simplified PDF export using print functionality
+      const content = generatePdfContent(thread);
+      
+      // Create a new window with the content for printing
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Enhanced CoD Studio Export - ${thread.name}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+            .header { border-bottom: 2px solid #5686f5; padding-bottom: 10px; margin-bottom: 20px; }
+            .message { margin-bottom: 20px; padding: 15px; border-radius: 8px; }
+            .user-message { background-color: #e3f2fd; border-left: 4px solid #2196f3; }
+            .bot-message { background-color: #f5f5f5; border-left: 4px solid #5686f5; }
+            .stage-info { background-color: #fff3e0; padding: 8px; margin: 10px 0; border-radius: 4px; font-size: 12px; }
+            .stats { font-size: 11px; color: #666; margin-top: 10px; }
+            .adaptive-info { background-color: #f3e5f5; padding: 8px; margin: 10px 0; border-radius: 4px; font-size: 12px; }
+            .memory-info { background-color: #e8f5e8; padding: 8px; margin: 10px 0; border-radius: 4px; font-size: 12px; }
+            pre { background-color: #f8f8f8; padding: 10px; border-radius: 4px; overflow-x: auto; }
+            @media print { body { margin: 0; } }
+          </style>
+        </head>
+        <body>
+          ${content}
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      
+      // Auto-print and close
+      printWindow.onload = () => {
+        printWindow.print();
+        setTimeout(() => printWindow.close(), 1000);
+      };
+      
+      showNotification("PDF export opened in new window");
+    }
+    
+    function generatePdfContent(thread) {
+      const memoryActive = Object.values(CONFIG.memoryCategories).some(v => v);
+      const mcpActive = Object.values(CONFIG.mcpServers).some(v => v);
+      
+      let content = `
+        <div class="header">
+          <h1>Enhanced Chain of Draft Studio</h1>
+          <h2>${thread.name}</h2>
+          <p><strong>Model:</strong> ${CONFIG.currentModel}</p>
+          <p><strong>Reasoning Method:</strong> ${CONFIG.reasoningMethod.toUpperCase()}</p>
+          <p><strong>Word Limit:</strong> ${CONFIG.codWordLimit} words per step</p>
+          <p><strong>Adaptive Detection:</strong> ${CONFIG.reasoningEnhancement === 'adaptive' ? 'Enabled' : 'Disabled'}</p>
+          <p><strong>Memory System:</strong> ${memoryActive ? 'Active' : 'Disabled'}</p>
+          <p><strong>MCP Tools:</strong> ${mcpActive ? 'Enabled' : 'Disabled'}</p>
+          <p><strong>Export Date:</strong> ${new Date().toLocaleString()}</p>
+        </div>
+      `;
+      
+      thread.messages.forEach((msg, index) => {
+        if (msg.isPlaceholder) return;
+        
+        const className = msg.sender === 'user' ? 'user-message' : 'bot-message';
+        const prefix = msg.sender.toUpperCase();
+        
+        content += `
+          <div class="message ${className}">
+            <h3>${prefix}:</h3>
+            <div>${msg.content.replace(/\n/g, '<br>')}</div>
+            
+            ${msg.stageInfo ? `<div class="stage-info"><strong>Stage:</strong> ${msg.stageInfo}</div>` : ''}
+            ${msg.reasoning ? `<div class="adaptive-info"><strong>Adaptive Reasoning:</strong> ${msg.reasoning}</div>` : ''}
+            
+            <div class="stats">
+              ${msg.wordCount ? `Words: ${msg.wordCount} | ` : ''}
+              ${msg.totalTokens ? `Tokens: ${msg.totalTokens} | ` : ''}
+              ${msg.durationSeconds ? `Time: ${msg.durationSeconds}s` : ''}
+            </div>
+          </div>
+        `;
+      });
+      
+      return content;
     }
     
     function showNotification(message, duration = 3000) {
@@ -846,7 +1647,6 @@ Format:
           
           if (attachedImages.length > 0) {
             imagePreviewArea.classList.remove('hidden');
-            updateVisionIndicator();
           }
           
           imageInput.value = '';
@@ -878,7 +1678,6 @@ Format:
           imagePreview.remove();
           if (attachedImages.length === 0) {
             document.getElementById('imagePreviewArea').classList.add('hidden');
-            updateVisionIndicator();
           }
         });
         
@@ -896,56 +1695,27 @@ Format:
       container.appendChild(imagePreview);
     }
     
-    function updateVisionIndicator() {
-      const visionIndicator = document.getElementById('visionIndicator');
-      const modelSelect = document.getElementById('modelSelect');
+    function isVisionModel(modelPath) {
+      const visionKeywords = ['vision', 'llava', 'gpt-4', 'claude', 'phi-3-vision'];
+      const lowerModel = modelPath.toLowerCase();
+      return visionKeywords.some(keyword => lowerModel.includes(keyword));
+    }
+    
+    function updateModelDisplay() {
+      const modelDisplayText = document.getElementById('modelDisplayText');
+      const adaptiveIndicator = document.getElementById('adaptiveIndicator');
       
-      if (attachedImages.length > 0 && VISION_ENABLED) {
-        visionIndicator.classList.remove('hidden');
-      } else {
-        visionIndicator.classList.add('hidden');
+      if (modelDisplayText) {
+        // Extract model name from path
+        const modelName = CONFIG.currentModel.split('/').pop() || 'Custom Model';
+        modelDisplayText.textContent = modelName;
       }
-    }
-    
-    function updateModelSelection() {
-      const modelSelect = document.getElementById('modelSelect');
-      if (!modelSelect) return;
       
-      modelSelect.addEventListener('change', (event) => {
-        const selectedModel = event.target.value;
-        
-        switch (selectedModel) {
-          case 'deepseek-v3-0324':
-            CURRENT_MODEL = DEEPSEEK_MODEL;
-            VISION_ENABLED = false;
-            break;
-          case 'phi3-vision':
-            CURRENT_MODEL = VISION_MODELS.phi3_vision;
-            VISION_ENABLED = true;
-            break;
-          case 'firellava':
-            CURRENT_MODEL = VISION_MODELS.firellava;
-            VISION_ENABLED = true;
-            break;
-          case 'deepseek-vision':
-            CURRENT_MODEL = VISION_MODELS.deepseek_vision;
-            VISION_ENABLED = true;
-            break;
-        }
-        
-        updateVisionIndicator();
-        updatePlaceholder();
-        showNotification(`Switched to ${event.target.options[event.target.selectedIndex].text}`);
-      });
-    }
-    
-    function updatePlaceholder() {
-      const textarea = document.getElementById('userInput');
-      if (textarea) {
-        if (VISION_ENABLED) {
-          textarea.placeholder = "Ask a complex problem for multi-stage CoD reasoning... (with images if vision enabled)";
+      if (adaptiveIndicator) {
+        if (CONFIG.reasoningEnhancement === 'adaptive') {
+          adaptiveIndicator.classList.remove('hidden');
         } else {
-          textarea.placeholder = "Ask a complex problem for multi-stage CoD reasoning...";
+          adaptiveIndicator.classList.add('hidden');
         }
       }
     }
@@ -960,88 +1730,6 @@ Format:
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
-    }
-    
-    function downloadCurrentThreadAsPdf() {
-      const thread = threads.find(t => t.id === currentThreadId);
-      if (!thread) {
-        showNotification("Error: No active thread found");
-        return;
-      }
-      
-      // Create a simplified PDF export using print functionality
-      // In a production environment, you'd use a proper PDF library like jsPDF
-      const content = generatePdfContent(thread);
-      
-      // Create a new window with the content for printing
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>CoD Studio Export - ${thread.name}</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-            .header { border-bottom: 2px solid #5686f5; padding-bottom: 10px; margin-bottom: 20px; }
-            .message { margin-bottom: 20px; padding: 15px; border-radius: 8px; }
-            .user-message { background-color: #e3f2fd; border-left: 4px solid #2196f3; }
-            .bot-message { background-color: #f5f5f5; border-left: 4px solid #5686f5; }
-            .stage-info { background-color: #fff3e0; padding: 8px; margin: 10px 0; border-radius: 4px; font-size: 12px; }
-            .stats { font-size: 11px; color: #666; margin-top: 10px; }
-            pre { background-color: #f8f8f8; padding: 10px; border-radius: 4px; overflow-x: auto; }
-            @media print { body { margin: 0; } }
-          </style>
-        </head>
-        <body>
-          ${content}
-        </body>
-        </html>
-      `);
-      printWindow.document.close();
-      
-      // Auto-print and close
-      printWindow.onload = () => {
-        printWindow.print();
-        setTimeout(() => printWindow.close(), 1000);
-      };
-      
-      showNotification("PDF export opened in new window");
-    }
-    
-    function generatePdfContent(thread) {
-      let content = `
-        <div class="header">
-          <h1>Advanced Chain of Draft Studio</h1>
-          <h2>${thread.name}</h2>
-          <p>Model: ${CURRENT_MODEL}</p>
-          <p>Method: ${REASONING_METHOD.toUpperCase()}</p>
-          <p>Export Date: ${new Date().toLocaleString()}</p>
-        </div>
-      `;
-      
-      thread.messages.forEach((msg, index) => {
-        if (msg.isPlaceholder) return;
-        
-        const className = msg.sender === 'user' ? 'user-message' : 'bot-message';
-        const prefix = msg.sender.toUpperCase();
-        
-        content += `
-          <div class="message ${className}">
-            <h3>${prefix}:</h3>
-            <div>${msg.content.replace(/\n/g, '<br>')}</div>
-            
-            ${msg.stageInfo ? `<div class="stage-info">${msg.stageInfo}</div>` : ''}
-            
-            <div class="stats">
-              ${msg.wordCount ? `Words: ${msg.wordCount} | ` : ''}
-              ${msg.totalTokens ? `Tokens: ${msg.totalTokens} | ` : ''}
-              ${msg.durationSeconds ? `Time: ${msg.durationSeconds}s` : ''}
-            </div>
-          </div>
-        `;
-      });
-      
-      return content;
     }
     
     function handleFileInput() {
@@ -1139,7 +1827,7 @@ Format:
       return processedText.split(/\s+/).filter(word => word.length > 0).length;
     }
     
-    function formatCoDAnylyalysis(content) {
+    function formatProblemAnalysis(content) {
       if (!content) return '';
       
       // Parse different sections
@@ -1177,7 +1865,7 @@ Format:
       return html;
     }
     
-    function formatCoDStage(content) {
+    function formatCoDStage(content, wordLimit) {
       if (!content) return '';
       
       let html = '';
@@ -1188,7 +1876,7 @@ Format:
         const codSteps = sections[0].trim();
         if (codSteps) {
           html += '<div class="cod-steps bg-green-900/20 border border-green-500/30 rounded-lg p-4 mb-4">';
-          html += '<div class="text-green-300 font-semibold mb-3">⚡ Chain of Draft Steps (5 words max)</div>';
+          html += `<div class="text-green-300 font-semibold mb-3">⚡ Chain of Draft Steps (${wordLimit} words max)</div>`;
           
           const steps = codSteps.split('\n').filter(line => line.trim());
           let stepCounter = 1;
@@ -1303,6 +1991,7 @@ Format:
             msgContent.className = "max-w-[90%] bg-primary-600 text-white p-4 rounded-2xl rounded-tr-sm shadow-md";
             msgContent.innerHTML = transformMessage(msg.content);
             if (msg.files && msg.files.length > 0) addFilesToMessage(msgContent, msg.files);
+            if (msg.images && msg.images.length > 0) addImagesToMessage(msgContent, msg.images);
             messageDiv.appendChild(msgContent);
           } else { // Bot message
             messageDiv.className = "flex justify-start";
@@ -1319,13 +2008,21 @@ Format:
             } else {
               // Handle different CoD stage types
               if (msg.stageType === 'analysis') {
-                msgContent.innerHTML = formatCoDAnylyalysis(msg.content);
+                msgContent.innerHTML = formatProblemAnalysis(msg.content);
               } else if (msg.stageType === 'cod_stage') {
-                msgContent.innerHTML = formatCoDStage(msg.content);
+                msgContent.innerHTML = formatCoDStage(msg.content, msg.wordLimit || CONFIG.codWordLimit);
               } else if (msg.stageType === 'synthesis') {
                 msgContent.innerHTML = formatSynthesis(msg.content);
               } else {
                 msgContent.innerHTML = transformMessage(msg.content);
+              }
+              
+              // Add adaptive reasoning notification
+              if (msg.reasoning) {
+                const adaptiveNotification = document.createElement("div");
+                adaptiveNotification.className = "mt-2 px-3 py-2 bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-lg text-xs";
+                adaptiveNotification.innerHTML = `<span class="text-purple-300">🧠 Adaptive:</span> <span class="text-purple-100">${msg.reasoning}</span>`;
+                msgContent.appendChild(adaptiveNotification);
               }
               
               // Add stage indicator if it's a multi-stage message
@@ -1383,11 +2080,18 @@ Format:
     function addFilesToMessage(msgContent, files) {
       const filesDiv = document.createElement('div'); 
       filesDiv.className = 'mt-2 text-xs text-gray-300 italic';
-      filesDiv.textContent = `(${files.length} file(s) attached, not sent to this model)`; 
+      filesDiv.textContent = `(${files.length} file(s) attached, not processed by this model)`; 
       msgContent.appendChild(filesDiv);
     }
     
-    function addMessageToCurrentThread(content, sender, isPlaceholder = false, files = [], stageType = null, stageInfo = null) {
+    function addImagesToMessage(msgContent, images) {
+      const imagesDiv = document.createElement('div'); 
+      imagesDiv.className = 'mt-2 text-xs text-purple-300 italic flex items-center gap-1';
+      imagesDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>(${images.length} image(s) sent to vision model)`; 
+      msgContent.appendChild(imagesDiv);
+    }
+    
+    function addMessageToCurrentThread(content, sender, isPlaceholder = false, files = [], images = [], stageType = null, stageInfo = null, reasoning = null, wordLimit = null) {
       const thread = threads.find(t => t.id === currentThreadId);
       if (thread) {
         const wordCount = sender === "bot" && !isPlaceholder ? (countWords(content) || 0) : (countWords(content) || 0);
@@ -1400,13 +2104,16 @@ Format:
           wordCount,
           stageType,
           stageInfo,
+          reasoning,
+          wordLimit,
           files: files && files.length > 0 ? files.map(f => ({ name: f.name, type: f.type, size: f.size })) : undefined,
+          images: images && images.length > 0 ? images.map(img => ({ name: img.name, type: img.type, size: img.size })) : undefined,
         });
         renderCurrentThreadMessages();
       }
     }
     
-    function buildMessagesForStage(stageType, originalQuestion, previousResults = []) {
+    function buildMessagesForStage(stageType, originalQuestion, previousResults = [], wordLimit = 5) {
       const messages = [];
       
       switch (stageType) {
@@ -1416,7 +2123,7 @@ Format:
           break;
           
         case 'cod_stage':
-          messages.push({ role: "system", content: PROMPTS.cod_stage });
+          messages.push({ role: "system", content: PROMPTS.cod_stage(wordLimit) });
           // Add context from analysis and previous stages
           let context = `Original Problem: ${originalQuestion}\n\n`;
           if (previousResults.length > 0) {
@@ -1425,7 +2132,7 @@ Format:
               context += `${result}\n\n`;
             });
           }
-          context += `Work on the assigned part using Chain of Draft methodology with 5-word maximum steps.`;
+          context += `Work on the assigned part using Chain of Draft methodology with ${wordLimit}-word maximum steps.`;
           messages.push({ role: "user", content: context });
           break;
           
@@ -1445,7 +2152,7 @@ Format:
     }
     
     async function buildMessagesWithImages(messages, images = []) {
-      if (!VISION_ENABLED || images.length === 0) {
+      if (!CONFIG.isVisionModel || images.length === 0) {
         return messages;
       }
       
@@ -1487,21 +2194,22 @@ Format:
     }
     
     async function sendMessage(message) {
-      if (REASONING_METHOD === "standard") {
+      if (CONFIG.reasoningMethod === "standard") {
         return await sendStandardMessage(message);
-      } else if (REASONING_METHOD === "multi_stage_cod") {
+      } else if (CONFIG.reasoningMethod === "multi_stage_cod") {
         return await sendMultiStageCoDMessage(message);
       }
     }
     
     async function sendStandardMessage(message) {
+      // Get adaptive settings if enabled
+      const adaptiveSettings = getAdaptiveReasoningSettings(message);
+      
       addMessageToCurrentThread(
         message, 
         "user", 
         false, 
         attachedFiles.map(f => ({name: f.name, type: f.type, size: f.size})),
-        null,
-        null,
         attachedImages.map(img => ({name: img.name, type: img.type, size: img.size}))
       );
       
@@ -1520,7 +2228,7 @@ Format:
         let messages = [{ role: "user", content: message }];
         
         // Add images if vision model is enabled
-        if (VISION_ENABLED && imagesToSend.length > 0) {
+        if (CONFIG.isVisionModel && imagesToSend.length > 0) {
           messages = await buildMessagesWithImages(messages, imagesToSend);
         }
         
@@ -1537,23 +2245,35 @@ Format:
           durationSeconds: durationSeconds,
           totalTokens: response.usage?.total_tokens,
           promptTokens: response.usage?.prompt_tokens,
-          completionTokens: response.usage?.completion_tokens
+          completionTokens: response.usage?.completion_tokens,
+          reasoning: adaptiveSettings.adapted ? adaptiveSettings.reasoning : null
         };
         
         renderCurrentThreadMessages();
+        
+        // Save conversation to memory
+        await analyzeAndSaveMemory(message, response.content, 'Standard reasoning');
+        
+        // Show adaptive notification if reasoning was adapted
+        if (adaptiveSettings.adapted && adaptiveSettings.reasoning) {
+          showNotification(adaptiveSettings.reasoning, 4000);
+        }
+        
       } catch (error) {
         handleAPIError(error, thread, placeholderIndex, startTime);
       }
     }
     
     async function sendMultiStageCoDMessage(message) {
+      // Get adaptive settings for the message
+      const adaptiveSettings = getAdaptiveReasoningSettings(message);
+      const actualWordLimit = adaptiveSettings.wordLimit;
+      
       addMessageToCurrentThread(
         message, 
         "user", 
         false, 
         attachedFiles.map(f => ({name: f.name, type: f.type, size: f.size})),
-        null,
-        null,
         attachedImages.map(img => ({name: img.name, type: img.type, size: img.size}))
       );
       
@@ -1567,6 +2287,11 @@ Format:
       
       showProgress(true, 0);
       
+      // Show adaptive notification if reasoning was adapted
+      if (adaptiveSettings.adapted && adaptiveSettings.reasoning) {
+        showNotification(adaptiveSettings.reasoning, 4000);
+      }
+      
       try {
         // Stage 1: Problem Analysis (with images if available)
         addMessageToCurrentThread("🔍 Analyzing problem complexity and decomposition...", "bot", true);
@@ -1576,7 +2301,7 @@ Format:
         let analysisMessages = buildMessagesForStage('analysis', message);
         
         // Add images to analysis stage if vision enabled
-        if (VISION_ENABLED && imagesToSend.length > 0) {
+        if (CONFIG.isVisionModel && imagesToSend.length > 0) {
           analysisMessages = await buildMessagesWithImages(analysisMessages, imagesToSend);
         }
         
@@ -1589,7 +2314,8 @@ Format:
           timestamp: new Date(),
           wordCount: countWords(analysisResult.content),
           stageType: 'analysis',
-          stageInfo: "Stage 1: Problem Analysis"
+          stageInfo: "Stage 1: Problem Analysis",
+          reasoning: adaptiveSettings.adapted ? adaptiveSettings.reasoning : null
         };
         
         results.push(analysisResult.content);
@@ -1603,10 +2329,10 @@ Format:
         
         // Stages 2-N: CoD for each part (text-only for subsequent stages)
         for (let i = 0; i < numParts; i++) {
-          addMessageToCurrentThread(`⚡ Working on Part ${i + 1} using Chain of Draft (5-word steps)...`, "bot", true);
+          addMessageToCurrentThread(`⚡ Working on Part ${i + 1} using Chain of Draft (${actualWordLimit}-word steps)...`, "bot", true);
           
           placeholderIndex = thread.messages.length - 1;
-          const codMessages = buildMessagesForStage('cod_stage', message, results);
+          const codMessages = buildMessagesForStage('cod_stage', message, results, actualWordLimit);
           codMessages[1].content += `\n\nFocus on Part ${i + 1} of ${numParts}.`;
           
           const codResult = await callFireworksAPI(codMessages);
@@ -1618,7 +2344,8 @@ Format:
             timestamp: new Date(),
             wordCount: countWords(codResult.content),
             stageType: 'cod_stage',
-            stageInfo: `Stage ${i + 2}: CoD Part ${i + 1}/${numParts}`
+            stageInfo: `Stage ${i + 2}: CoD Part ${i + 1}/${numParts}`,
+            wordLimit: actualWordLimit
           };
           
           results.push(codResult.content);
@@ -1653,11 +2380,14 @@ Format:
         renderCurrentThreadMessages();
         showProgress(true, 100);
         
+        // Save conversation to memory
+        await analyzeAndSaveMemory(message, synthesisResult.content, `Multi-stage CoD with ${numParts} parts`);
+        
         setTimeout(() => {
           showProgress(false);
         }, 1000);
         
-        showNotification(`Multi-Stage CoD completed with ${numParts} parts!`);
+        showNotification(`Multi-Stage CoD completed with ${numParts} parts (${actualWordLimit} words/step)!`);
         
       } catch (error) {
         showProgress(false);
@@ -1678,12 +2408,12 @@ Format:
     
     async function callFireworksAPI(messages) {
       const payload = {
-        model: CURRENT_MODEL,
+        model: CONFIG.currentModel,
         messages: messages,
-        temperature: TEMPERATURE,
-        top_p: TOP_P,
-        top_k: TOP_K,
-        max_tokens: MAX_TOKENS,
+        temperature: CONFIG.temperature,
+        top_p: CONFIG.topP,
+        top_k: CONFIG.topK,
+        max_tokens: CONFIG.maxTokens,
         stream: false // Multi-stage CoD uses non-streaming for control
       };
       
@@ -1724,8 +2454,14 @@ Format:
       const endTime = performance.now();
       const durationSeconds = ((endTime - startTime) / 1000).toFixed(2);
       let errorMessage = "Error: " + error.message;
-      if (error.message.includes("401")) errorMessage = "Authentication failed. Check API Key.";
-      else if (error.message.includes("429")) errorMessage = "Rate limit exceeded. Try again later.";
+      
+      if (error.message.includes("401")) {
+        errorMessage = "Authentication failed. Check API Key in your server environment.";
+      } else if (error.message.includes("429")) {
+        errorMessage = "Rate limit exceeded. Try again later.";
+      } else if (error.message.includes("404")) {
+        errorMessage = "Model not found. Check that the model path is correct and available on Fireworks AI.";
+      }
       
       thread.messages[placeholderIndex] = {
         content: errorMessage,
@@ -1740,9 +2476,20 @@ Format:
     
     function clearAttachedFiles() {
       const attachedFilesContainer = document.getElementById('attachedFiles');
+      const imagePreviewArea = document.getElementById('imagePreviewArea');
+      const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+      
       if (attachedFilesContainer) {
         attachedFilesContainer.innerHTML = '';
         attachedFilesContainer.classList.add('hidden');
+      }
+      
+      if (imagePreviewArea) {
+        imagePreviewArea.classList.add('hidden');
+      }
+      
+      if (imagePreviewContainer) {
+        imagePreviewContainer.innerHTML = '';
       }
     }
     
@@ -1792,26 +2539,6 @@ Format:
       });
     }
     
-    function toggleWebSearchQuickButton() {
-      const btn = document.getElementById('webSearchBtn'); 
-      if (!btn) return;
-      
-      enableWebSearchQuickToggle = !enableWebSearchQuickToggle;
-      
-      if (enableWebSearchQuickToggle) { 
-        btn.classList.add('bg-primary-500', 'text-white'); 
-        btn.classList.remove('bg-dark-500', 'text-gray-300'); 
-        btn.title = "Tavily Web Search enabled"; 
-      } else { 
-        btn.classList.remove('bg-primary-500', 'text-white'); 
-        btn.classList.add('bg-dark-500', 'text-gray-300'); 
-        btn.title = "Tavily Web Search disabled"; 
-      }
-      
-      localStorage.setItem('enableWebSearchQuickToggle', enableWebSearchQuickToggle.toString()); 
-      showNotification(enableWebSearchQuickToggle ? 'Tavily search enabled' : 'Tavily search disabled');
-    }
-
     function setupTabNavigation() {
       const tabButtons = document.querySelectorAll('.tab-btn'); 
       const tabContents = document.querySelectorAll('.tab-content');
@@ -1861,16 +2588,65 @@ Format:
     }
     
     function openSettingsModal() {
-      const reasoningRadio = document.getElementById(`${REASONING_METHOD}`.replace('_', ''));
+      // Set current model selection
+      const modelRadios = document.querySelectorAll('input[name="modelType"]');
+      const customModelInput = document.getElementById('customModelPath');
+      
+      // Check if current model is a preset
+      let isPreset = false;
+      modelRadios.forEach(radio => {
+        if (radio.dataset.model === CONFIG.currentModel) {
+          radio.checked = true;
+          isPreset = true;
+        }
+      });
+      
+      // If not a preset, use custom
+      if (!isPreset) {
+        const customRadio = document.querySelector('input[name="modelType"][value="custom"]');
+        if (customRadio) {
+          customRadio.checked = true;
+          if (customModelInput) {
+            customModelInput.value = CONFIG.currentModel;
+          }
+        }
+      }
+      
+      // Set reasoning method
+      const reasoningRadio = document.getElementById(`${CONFIG.reasoningMethod}`.replace('_', ''));
       if (reasoningRadio) reasoningRadio.checked = true;
       
-      setSliderAndValue("temp", TEMPERATURE); 
-      setSliderAndValue("topP", TOP_P); 
-      setSliderAndValue("topK", TOP_K); 
-      setSliderAndValue("maxTokens", MAX_TOKENS);
+      // Set CoD word limit
+      const wordLimitRadio = document.getElementById(`cod${CONFIG.codWordLimit}Words`);
+      if (wordLimitRadio) wordLimitRadio.checked = true;
+      
+      // Set reasoning enhancement
+      const enhancementRadio = document.getElementById(`${CONFIG.reasoningEnhancement}${CONFIG.reasoningEnhancement === 'adaptive' ? 'Complexity' : 'Reasoning'}`);
+      if (enhancementRadio) enhancementRadio.checked = true;
+      
+      // Set memory categories
+      Object.entries(CONFIG.memoryCategories).forEach(([category, enabled]) => {
+        const checkbox = document.getElementById(`save${category.charAt(0).toUpperCase() + category.slice(1).replace(/([A-Z])/g, '$1')}`);
+        if (checkbox) checkbox.checked = enabled;
+      });
+      
+      // Set memory retention
+      const memoryRetentionSelect = document.getElementById('memoryRetention');
+      if (memoryRetentionSelect) memoryRetentionSelect.value = CONFIG.memoryRetention;
+      
+      // Set MCP servers
+      Object.entries(CONFIG.mcpServers).forEach(([server, enabled]) => {
+        const checkbox = document.getElementById(`mcp${server.charAt(0).toUpperCase() + server.slice(1)}`);
+        if (checkbox) checkbox.checked = enabled;
+      });
+      
+      setSliderAndValue("temp", CONFIG.temperature); 
+      setSliderAndValue("topP", CONFIG.topP); 
+      setSliderAndValue("topK", CONFIG.topK); 
+      setSliderAndValue("maxTokens", CONFIG.maxTokens);
       
       const streamingToggle = document.getElementById('streamingToggle'); 
-      if (streamingToggle) streamingToggle.checked = ENABLE_STREAMING;
+      if (streamingToggle) streamingToggle.checked = CONFIG.enableStreaming;
       
       const modal = document.getElementById("settingsModal"); 
       if (modal) modal.style.display = "flex";
@@ -1892,27 +2668,79 @@ Format:
     }
     
     function saveSettings() {
-      const streamingToggle = document.getElementById('streamingToggle'); 
-      if (streamingToggle) { 
-        ENABLE_STREAMING = streamingToggle.checked; 
-        localStorage.setItem('streamingEnabled', ENABLE_STREAMING.toString()); 
+      // Save model selection
+      const modelRadios = document.querySelectorAll('input[name="modelType"]:checked');
+      const customModelInput = document.getElementById('customModelPath');
+      
+      if (modelRadios.length > 0) {
+        const selectedRadio = modelRadios[0];
+        if (selectedRadio.value === 'custom') {
+          if (customModelInput && customModelInput.value.trim()) {
+            CONFIG.currentModel = customModelInput.value.trim();
+          } else {
+            showNotification("Please enter a custom model path");
+            return;
+          }
+        } else {
+          CONFIG.currentModel = selectedRadio.dataset.model;
+        }
       }
       
+      // Update vision model detection
+      CONFIG.isVisionModel = isVisionModel(CONFIG.currentModel);
+      
+      // Save reasoning method
       const reasoningRadios = document.getElementsByName("reasoningMethod"); 
       for (const radio of reasoningRadios) {
-        if (radio.checked) REASONING_METHOD = radio.value;
+        if (radio.checked) CONFIG.reasoningMethod = radio.value;
       }
       
-      TEMPERATURE = parseFloat(document.getElementById("temp").value); 
-      TOP_P = parseFloat(document.getElementById("topP").value); 
-      TOP_K = parseInt(document.getElementById("topK").value); 
-      MAX_TOKENS = parseInt(document.getElementById("maxTokens").value);
+      // Save CoD word limit
+      const wordLimitRadios = document.getElementsByName("codWordLimit"); 
+      for (const radio of wordLimitRadios) {
+        if (radio.checked) CONFIG.codWordLimit = parseInt(radio.value);
+      }
       
-      localStorage.setItem("reasoningMethod", REASONING_METHOD); 
-      localStorage.setItem("temperature", TEMPERATURE.toString()); 
-      localStorage.setItem("topP", TOP_P.toString()); 
-      localStorage.setItem("topK", TOP_K.toString()); 
-      localStorage.setItem("maxTokens", MAX_TOKENS.toString());
+      // Save reasoning enhancement
+      const enhancementRadios = document.getElementsByName("reasoningEnhancement"); 
+      for (const radio of enhancementRadios) {
+        if (radio.checked) CONFIG.reasoningEnhancement = radio.value;
+      }
+      
+      // Save memory categories
+      CONFIG.memoryCategories.personalInfo = document.getElementById('savePersonalInfo')?.checked || false;
+      CONFIG.memoryCategories.projectDetails = document.getElementById('saveProjectDetails')?.checked || false;
+      CONFIG.memoryCategories.technicalKnowledge = document.getElementById('saveTechnicalKnowledge')?.checked || false;
+      CONFIG.memoryCategories.conversationHistory = document.getElementById('saveConversationHistory')?.checked || false;
+      CONFIG.memoryCategories.fileOperations = document.getElementById('saveFileOperations')?.checked || false;
+      
+      // Save memory retention
+      const memoryRetentionSelect = document.getElementById('memoryRetention');
+      if (memoryRetentionSelect) CONFIG.memoryRetention = memoryRetentionSelect.value;
+      
+      // Save MCP servers
+      CONFIG.mcpServers.filesystem = document.getElementById('mcpFilesystem')?.checked || false;
+      CONFIG.mcpServers.puppeteer = document.getElementById('mcpPuppeteer')?.checked || false;
+      CONFIG.mcpServers.sqlite = document.getElementById('mcpSqlite')?.checked || false;
+      CONFIG.mcpServers.git = document.getElementById('mcpGit')?.checked || false;
+      CONFIG.mcpServers.webSearch = document.getElementById('mcpWebSearch')?.checked || false;
+      CONFIG.mcpServers.webFetch = document.getElementById('mcpWebFetch')?.checked || false;
+      
+      const streamingToggle = document.getElementById('streamingToggle'); 
+      if (streamingToggle) { 
+        CONFIG.enableStreaming = streamingToggle.checked; 
+      }
+      
+      CONFIG.temperature = parseFloat(document.getElementById("temp").value); 
+      CONFIG.topP = parseFloat(document.getElementById("topP").value); 
+      CONFIG.topK = parseInt(document.getElementById("topK").value); 
+      CONFIG.maxTokens = parseInt(document.getElementById("maxTokens").value);
+      
+      // Save to localStorage
+      localStorage.setItem("enhancedCodConfig", JSON.stringify(CONFIG));
+      
+      // Update model display
+      updateModelDisplay();
       
       closeSettingsModal(); 
       showNotification("Settings saved");
@@ -1970,29 +2798,26 @@ Format:
     }
     
     function loadPersistedSettings() {
-      REASONING_METHOD = localStorage.getItem("reasoningMethod") || "multi_stage_cod";
+      try {
+        const savedConfig = localStorage.getItem("enhancedCodConfig");
+        if (savedConfig) {
+          const parsed = JSON.parse(savedConfig);
+          Object.assign(CONFIG, parsed);
+        }
+      } catch (error) {
+        console.warn("Failed to load saved settings:", error);
+      }
       
-      const temp = localStorage.getItem("temperature"); 
-      if (temp) TEMPERATURE = parseFloat(temp); else TEMPERATURE = 0.3; // DeepSeek optimized
+      // Update vision model detection based on loaded model
+      CONFIG.isVisionModel = isVisionModel(CONFIG.currentModel);
       
-      const topP = localStorage.getItem("topP"); 
-      if (topP) TOP_P = parseFloat(topP); else TOP_P = 0.9;
-      
-      const topK = localStorage.getItem("topK"); 
-      if (topK) TOP_K = parseInt(topK); else TOP_K = 40;
-      
-      const maxTokens = localStorage.getItem("maxTokens"); 
-      if (maxTokens) MAX_TOKENS = parseInt(maxTokens); else MAX_TOKENS = 8192;
-      
-      const streaming = localStorage.getItem('streamingEnabled'); 
-      if (streaming !== null) ENABLE_STREAMING = streaming === 'true'; else ENABLE_STREAMING = true;
-      
-      const webSearchToggle = localStorage.getItem('enableWebSearchQuickToggle'); 
-      if (webSearchToggle !== null) enableWebSearchQuickToggle = webSearchToggle === 'true'; else enableWebSearchQuickToggle = false;
+      // Load memory
+      loadMemoryFromStorage();
     }
     
     function initApp() { 
       loadPersistedSettings(); 
+      updateModelDisplay();
       createNewThread(); 
       initEventListeners(); 
       initMobileNavigation(); 
@@ -2029,7 +2854,30 @@ Format:
         }
       });
       
-      addListener("webSearchBtn", "click", toggleWebSearchQuickButton);
+      // Memory-related event listeners
+      addListener("viewSavedMemories", "click", () => {
+        showNotification("Memory viewer coming soon! Check browser localStorage for now.");
+      });
+      
+      addListener("clearAllMemory", "click", () => {
+        if (confirm("Are you sure you want to clear all saved memories? This cannot be undone.")) {
+          clearMemory();
+        }
+      });
+      
+      // MCP-related event listeners
+      addListener("addMcpServer", "click", () => {
+        const nameInput = document.getElementById('mcpServerName');
+        const commandInput = document.getElementById('mcpServerCommand');
+        
+        if (nameInput?.value && commandInput?.value) {
+          showNotification(`MCP server "${nameInput.value}" added to configuration`);
+          nameInput.value = '';
+          commandInput.value = '';
+        } else {
+          showNotification("Please enter both server name and command");
+        }
+      });
       
       const textarea = document.getElementById('userInput');
       if (textarea) { 
@@ -2060,7 +2908,6 @@ Format:
       
       handleFileInput();
       handleImageInput();
-      updateModelSelection();
       
       window.addEventListener("click", (event) => { 
         const settingsModal = document.getElementById("settingsModal"); 
